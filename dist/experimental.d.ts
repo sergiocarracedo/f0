@@ -5,11 +5,13 @@ import { AlertTagCellValue as AlertTagCellValue_2 } from '../../value-display/ty
 import { AmountCellValue } from './types/amount';
 import { AmountCellValue as AmountCellValue_2 } from '../../value-display/types/amount';
 import { AnchorHTMLAttributes } from 'react';
+import { AreaChartWidgetProps } from './AreaChartWidget';
 import { AriaAttributes } from 'react';
 import { AutoFill as AutoFill_2 } from 'react';
 import { AvatarListCellValue } from './types/avatarList';
 import { AvatarListCellValue as AvatarListCellValue_2 } from '../../value-display/types/avatarList';
 import * as AvatarPrimitive from '@radix-ui/react-avatar';
+import { BarChartProps } from '../../../components/Charts/BarChart';
 import { baseColors } from '@factorialco/f0-core';
 import { ButtonHTMLAttributes } from 'react';
 import { ClassValue } from 'cva';
@@ -50,6 +52,7 @@ import { InputProps as InputProps_2 } from '@copilotkit/react-ui';
 import { JSONContent } from '@tiptap/react';
 import { JSONContent as JSONContent_2 } from '@tiptap/core';
 import { JSX as JSX_2 } from 'react';
+import { LineChartProps } from '../../../components/Charts/LineChart';
 import { LongTextCellValue } from './types/longText';
 import { Message as Message_2 } from '@copilotkit/shared';
 import { NumberCellValue } from './types/number';
@@ -60,6 +63,7 @@ import { Path } from 'react-hook-form';
 import { PercentageCellValue } from './types/percentage';
 import { PersonCellValue } from './types/person';
 import { PersonCellValue as PersonCellValue_2 } from '../../value-display/types/person';
+import { PieChartProps } from '../../../components/Charts/PieChart';
 import { PopoverProps } from '@radix-ui/react-popover';
 import { ProgressBarCellValue } from './types/progressBar';
 import { ProgressBarCellValue as ProgressBarCellValue_2 } from '../../value-display/types/progressBar';
@@ -91,6 +95,8 @@ import { UseFormProps } from 'react-hook-form';
 import { UseFormReturn } from 'react-hook-form';
 import { ValueDisplayRendererContext as ValueDisplayRendererContext_2 } from '../../value-display';
 import { VariantProps } from 'cva';
+import { VerticalBarChartProps } from '../../../components/Charts/VerticalBarChart';
+import { WidgetProps as WidgetProps_2 } from '../Widget';
 import { z } from 'zod';
 import { ZodType } from 'zod';
 
@@ -100,6 +106,13 @@ declare type Action = {
     icon?: IconType;
     variant?: F0ButtonProps["variant"];
     disabled?: boolean;
+};
+
+declare type Action_2 = {
+    label: string;
+    onClick: () => void;
+    icon?: IconType;
+    variant?: "default" | "outline" | "promote";
 };
 
 export declare type ActionBarGroup = {
@@ -577,34 +590,7 @@ declare const alertAvatarVariants: (props?: ({
 
 export declare const AlertDescription: React_2.ForwardRefExoticComponent<React_2.HTMLAttributes<HTMLParagraphElement> & React_2.RefAttributes<HTMLParagraphElement>>;
 
-declare interface AlertProps extends VariantProps<typeof alertVariants> {
-    title: string;
-    description: string;
-    action?: {
-        label: string;
-        onClick: () => void;
-    };
-    link?: {
-        label: string;
-        href: string;
-    };
-    icon?: IconType;
-    variant: AlertVariant;
-}
-
 export declare const AlertTitle: React_2.ForwardRefExoticComponent<React_2.HTMLAttributes<HTMLHeadingElement> & React_2.RefAttributes<HTMLParagraphElement>>;
-
-declare type AlertVariant = "info" | "warning" | "critical" | "neutral" | "positive";
-
-declare const alertVariants: (props?: ({
-    variant?: "info" | "critical" | "warning" | "positive" | "neutral" | undefined;
-} & ({
-    class?: ClassValue;
-    className?: never;
-} | {
-    class?: never;
-    className?: ClassValue;
-})) | undefined) => string;
 
 export declare function ApplicationFrame({ children, sidebar, banner, ai, aiPromotion, }: ApplicationFrameProps): JSX_2.Element;
 
@@ -631,6 +617,8 @@ declare type Approver = {
     avatar?: string;
     status: Status;
 };
+
+export declare const AreaChartWidget: ForwardRefExoticComponent<Omit<AreaChartWidgetProps & RefAttributes<HTMLDivElement>, "ref"> & RefAttributes<HTMLElement | SVGElement>>;
 
 export declare const AutoGrid: ForwardRefExoticComponent<Omit<HTMLAttributes<HTMLDivElement> & VariantProps<(props?: ({
 tileSize?: "lg" | "md" | "sm" | undefined;
@@ -728,6 +716,10 @@ export declare type BannerAction = {
     variant?: "default" | "outline" | "ghost";
     icon?: IconType;
 };
+
+export declare const BarChartWidget: ForwardRefExoticComponent<Omit<WidgetProps_2 & {
+chart: BarChartProps;
+} & RefAttributes<HTMLDivElement>, "ref"> & RefAttributes<HTMLElement | SVGElement>>;
 
 export declare const BaseActivityItemList: ({ items, loadingMoreItems, onClickItem, onEndReached, onEndReachedItemsThreshold, }: ActivityItemListProps) => default_2.JSX.Element;
 
@@ -1002,6 +994,14 @@ export declare interface BreadcrumbState {
     minWidth: number | undefined;
 }
 
+declare interface BreakType {
+    id: string;
+    name: string;
+    duration?: string;
+    description?: string;
+    isPaid: boolean;
+}
+
 /**
  * Represents a bulk action that can be performed on a collection.
  */
@@ -1173,6 +1173,31 @@ export declare type CalendarDate = {
     year: number;
 };
 
+export declare const CalendarEvent: ForwardRefExoticComponent<CalendarEventProps & RefAttributes<HTMLDivElement>>;
+
+export declare const CalendarEventList: FC<CalendarEventListProps>;
+
+export declare interface CalendarEventListProps {
+    events: CalendarEventProps[];
+    gap?: number;
+    showAllItems?: boolean;
+    minSize?: number;
+}
+
+export declare interface CalendarEventProps {
+    label?: string;
+    title: string;
+    subtitle?: string;
+    description: string;
+    color: string;
+    isPending: boolean;
+    leftTags?: Tag[];
+    rightTags?: Tag[];
+    fromDate?: Date;
+    toDate?: Date;
+    noBackground?: boolean;
+}
+
 export declare type CalendarMode = "single" | "range";
 
 export declare type CalendarView = "day" | "month" | "year" | "week" | "quarter" | "halfyear";
@@ -1285,6 +1310,27 @@ declare interface CarouselProps {
     }[];
 }
 
+declare interface CategoryBarProps {
+    data: {
+        name: string;
+        value: number;
+        color?: string;
+    }[];
+    legend: boolean;
+    hideTooltip?: boolean;
+}
+
+export declare function CategoryBarSection({ title, subtitle, data, helpText, legend, hideTooltip, }: CategoryBarSectionProps): JSX_2.Element;
+
+declare interface CategoryBarSectionProps {
+    title: string;
+    subtitle: string;
+    data: CategoryBarProps["data"];
+    helpText?: string;
+    legend?: boolean;
+    hideTooltip?: boolean;
+}
+
 export declare const Celebration: (({ link, firstName, lastName, src, onClick, canReact, lastEmojiReaction, onReactionSelect, type, typeLabel, date, }: CelebrationProps) => JSX_2.Element) & {
     Skeleton: () => JSX_2.Element;
 };
@@ -1334,9 +1380,13 @@ declare type ChartItem<K extends ChartConfig> = {
     };
 };
 
+export declare const ChartWidgetEmptyState: ForwardRefExoticComponent<Props_4 & RefAttributes<HTMLDivElement>>;
+
 declare type ChatTextareaProps = InputProps_2 & {
     submitLabel?: string;
 };
+
+export declare type ChatWidgetEmptyStateProps = Props_4;
 
 declare type ChildrenPaginationInfo = {
     total: number;
@@ -1360,6 +1410,68 @@ declare type ChipLabel = {
     icon?: never;
     avatar?: never;
 });
+
+export declare function ClockInControls({ trackedMinutes, remainingMinutes, data, labels, locationId, locations, canShowLocation, locationSelectorDisabled, onClockIn, onClockOut, onBreak, breakTypes, onChangeBreakTypeId, canShowBreakButton, canSeeGraph, canSeeRemainingTime, onChangeLocationId, canShowProject, projectSelectorElement, breakTypeName, }: ClockInControlsProps): JSX_2.Element;
+
+export declare interface ClockInControlsProps {
+    /** Optional remaining time in minutes */
+    remainingMinutes?: number;
+    /** Clock in entries data */
+    data: ClockInGraphProps["data"];
+    /** Tracked minutes */
+    trackedMinutes: number;
+    /** Labels for all text content */
+    labels: {
+        clockedOut: string;
+        clockedIn: string;
+        onBreak: string;
+        clockIn: string;
+        clockOut: string;
+        break: string;
+        resume: string;
+        remainingTime: string;
+        overtime: string;
+        selectLocation: string;
+        selectProject: string;
+        paid: string;
+        unpaid: string;
+    };
+    locationId?: string;
+    onChangeLocationId: Dispatch<string>;
+    locations: {
+        id: string;
+        name: string;
+        icon: IconType;
+    }[];
+    breakTypes?: BreakType[];
+    onChangeBreakTypeId?: Dispatch<string>;
+    canShowLocation?: boolean;
+    locationSelectorDisabled?: boolean;
+    canShowBreakButton?: boolean;
+    canSeeGraph?: boolean;
+    canSeeRemainingTime?: boolean;
+    /** Callback when Clock In button is clicked */
+    onClockIn?: () => void;
+    /** Callback when Clock Out button is clicked */
+    onClockOut?: () => void;
+    /** Callback when Break button is clicked */
+    onBreak?: (breakTypeId?: string) => void;
+    canShowProject?: boolean;
+    projectSelectorElement?: React.ReactNode;
+    breakTypeName?: string;
+}
+
+declare interface ClockInGraphProps {
+    trackedMinutes?: number;
+    data?: {
+        from: Date;
+        to: Date;
+        variant: ClockInStatus;
+    }[];
+    remainingMinutes?: number;
+}
+
+declare type ClockInStatus = "clocked-in" | "break" | "clocked-out";
 
 export declare const CoCreationForm: ({ elements: elementsProp, isEditMode, onChange, disallowOptionalQuestions, allowedQuestionTypes, applyingChanges, }: CoCreationFormProps) => JSX_2.Element;
 
@@ -1583,6 +1695,19 @@ export declare type CustomVisualizationProps<Source extends {
     onLoadData: OnLoadDataCallback<InferRecord<Source>, InferFilters<Source>>;
     onLoadError: OnLoadErrorCallback;
     source: Source;
+};
+
+export declare const Dashboard: ForwardRefExoticComponent<DashboardProps & RefAttributes<HTMLDivElement>> & {
+    Skeleton: () => JSX_2.Element;
+};
+
+declare type DashboardProps = {
+    widgetWidth?: WidgetWidth;
+    children?: ReactNode[];
+};
+
+declare type DashboardProps_2 = {
+    children: ReactNode[];
 };
 
 declare type Data<R extends RecordType> = {
@@ -2672,6 +2797,8 @@ export declare const F0AiBanner: ForwardRefExoticComponent<AiBannerInternalProps
 
 export declare type F0AiBannerProps = AiBannerInternalProps;
 
+declare const F0AvatarAlert: ({ type, size, "aria-label": ariaLabel, "aria-labelledby": ariaLabelledby, }: AlertAvatarProps) => JSX_2.Element;
+
 declare type F0AvatarCompanyProps = {
     name: string;
     src?: string;
@@ -2903,6 +3030,10 @@ export { F0SelectProps }
 export { F0SelectProps as SelectProps }
 
 export declare function F0TableOfContent(props: TOCProps): JSX_2.Element;
+
+declare const F0TagAlert: ForwardRefExoticComponent<Props_7 & RefAttributes<HTMLDivElement>>;
+
+declare const F0TagRaw: ForwardRefExoticComponent<F0TagRawProps & RefAttributes<HTMLDivElement>>;
 
 declare type F0TagRawProps = {
     /**
@@ -3368,6 +3499,24 @@ declare type IdStructure = {
     children?: IdStructure[];
 };
 
+declare const Indicator: ForwardRefExoticComponent<IndicatorProps & RefAttributes<HTMLDivElement>>;
+
+declare type IndicatorProps = {
+    content: string;
+    label: string;
+    color?: string;
+} & ({
+    icon?: IconType;
+} | {
+    emoji?: string;
+});
+
+export declare const IndicatorsList: ForwardRefExoticComponent<IndicatorsListProps & RefAttributes<HTMLDivElement>>;
+
+export declare interface IndicatorsListProps {
+    items: ComponentProps<typeof Indicator>[];
+}
+
 declare type InferFilters<S> = S extends {
     dataAdapter: DataCollectionDataAdapter<any, infer F, any>;
 } ? F : never;
@@ -3623,6 +3772,14 @@ export declare type lastIntentType = {
     selectedIntent?: string;
     customIntent?: string;
 } | null;
+
+declare type Level = (typeof levels)[number];
+
+declare const levels: readonly ["info", "warning", "critical", "positive"];
+
+export declare const LineChartWidget: ForwardRefExoticComponent<Omit<WidgetProps_2 & {
+chart: LineChartProps;
+} & RefAttributes<HTMLDivElement>, "ref"> & RefAttributes<HTMLElement | SVGElement>>;
 
 declare type LinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
     exactMatch?: boolean;
@@ -4187,8 +4344,6 @@ export declare type OnDuplicateElementParams = {
     type: ElementType;
 };
 
-export declare const OneAlert: ({ title, description, action, link, icon, variant, }: AlertProps) => JSX_2.Element;
-
 export declare const OneApprovalHistory: FC<OneApprovalHistoryProps>;
 
 declare type OneApprovalHistoryProps = {
@@ -4519,6 +4674,36 @@ declare interface Option_2 {
     onClick?: (event: any) => unknown;
 }
 
+declare interface OverflowListProps<T> {
+    items: T[];
+    /**
+     * What to render as a list item (items outside of the overflow list)
+     * @param item - The item to render
+     * @param index - The index of the item
+     * @param isVisible - Whether this item is in the visible list (true) or measurement container (false)
+     */
+    renderListItem: (item: T, index: number, isVisible?: boolean) => ReactNode;
+    /**
+     * Additional styling for the container
+     */
+    className?: string;
+    /**
+     * The gap between items in pixels
+     * @default 8
+     */
+    gap?: number;
+    /**
+     * The minimum size of the container
+     * @default 0
+     */
+    minSize: number;
+    /**
+     * Callback when the visible items change
+     * @param visibleItems - The visible items
+     */
+    onVisibleItemsChange?: (visibleItems: T[]) => void;
+}
+
 export declare function Page({ children, header, embedded }: PageProps): JSX_2.Element;
 
 export declare namespace Page {
@@ -4626,6 +4811,10 @@ declare type PersonAvatarVariant = Extract<AvatarVariant, {
 }>;
 
 declare const PersonItem: ForwardRefExoticComponent<EmployeeItemProps & RefAttributes<HTMLLIElement>>;
+
+export declare const PieChartWidget: ForwardRefExoticComponent<Omit<WidgetProps_2 & {
+chart: PieChartProps;
+} & RefAttributes<HTMLDivElement>, "ref"> & RefAttributes<HTMLElement | SVGElement>>;
 
 declare type PostDescriptionProps = {
     content: HTMLString;
@@ -4836,6 +5025,51 @@ declare type Props_3 = {
 } | {
     customColor: string;
 });
+
+declare interface Props_4 {
+    title: string;
+    content: string;
+    buttonLabel?: string;
+    buttonIcon?: IconType;
+    buttonAction?: () => void;
+    type: Type;
+}
+
+declare type Props_5 = {
+    label: string;
+    icon: IconType;
+    iconClassName?: string;
+    count: number;
+    onClick?: () => void;
+};
+
+declare type Props_6<Id extends string | number = string | number> = {
+    id: Id;
+    module?: ModuleId;
+    title: string;
+    subtitle: string;
+    onClick?: (id: Id) => void;
+};
+
+declare type Props_7<Text extends string = string> = {
+    text: Text extends "" ? never : Text;
+    level: Level;
+};
+
+declare type Props_8<Id extends string | number = string | number> = {
+    items: Omit<WidgetInboxListItemProps<Id>, "onClick">[];
+    minSize?: number;
+    onClickItem?: (id: Id) => void;
+    showAllItems?: boolean;
+} & Pick<ComponentProps<typeof VerticalOverflowList>, "onVisibleItemsChange">;
+
+declare type Props_9<Id extends string | number = string | number> = {
+    items: Omit<WidgetSimpleListItemProps<Id>, "onClick">[];
+    minSize?: number;
+    gap?: number;
+    onClickItem?: (id: Id) => void;
+    showAllItems?: boolean;
+};
 
 declare type Pulse = (typeof pulses)[number];
 
@@ -5205,6 +5439,16 @@ declare type SidebarState = "locked" | "unlocked" | "hidden";
  */
 declare type SimpleResult<T> = T[];
 
+declare const skeletonVariants: (props?: ({
+    height?: "lg" | "md" | "sm" | undefined;
+} & ({
+    class?: ClassValue;
+    className?: never;
+} | {
+    class?: never;
+    className?: ClassValue;
+})) | undefined) => string;
+
 declare interface SlashCommandGroupLabels {
     textStyles: string;
     lists: string;
@@ -5352,6 +5596,8 @@ declare interface SuccessMessageProps {
 export declare type SummariesDefinition = Record<string, {
     type: SummaryType;
 }>;
+
+export declare const SummariesWidget: ForwardRefExoticComponent<Omit<WidgetProps_2 & RefAttributes<HTMLDivElement>, "ref"> & RefAttributes<HTMLElement | SVGElement>>;
 
 /**
  * Type helper to extract keys from a SummaryDefinition
@@ -5533,7 +5779,40 @@ export declare interface TabsProps {
 
 export declare const TabsSkeleton: React.FC<Pick<TabsProps, "secondary">>;
 
+declare type Tag = {
+    icon: IconType;
+    label?: string;
+    description?: string;
+};
+
 declare const tagDotColors: ["viridian", "malibu", "yellow", "purple", "lilac", "barbie", "smoke", "army", "flubber", "indigo", "camel"];
+
+declare interface Task {
+    id: number | string;
+    text: string;
+    badge?: {
+        text: string;
+        isPastDue?: boolean;
+    };
+    counter?: number;
+}
+
+export declare function TasksList({ tasks, onClickTask, hideIcons, maxTasksToShow, emptyMessage, }: TasksListProps): JSX_2.Element;
+
+declare function TasksList({ tasks, onClickTask, hideIcons, maxTasksToShow, emptyMessage, }: TasksListProps): JSX_2.Element;
+
+declare interface TasksList_2 {
+    inProgress?: (Task | string)[];
+    todo?: (Task | string)[];
+}
+
+export declare interface TasksListProps {
+    tasks: TasksList_2;
+    maxTasksToShow?: number;
+    onClickTask?: (task: Task) => void;
+    emptyMessage?: string;
+    hideIcons?: boolean;
+}
 
 declare type TeamAvatarVariant = Extract<AvatarVariant, {
     type: "team";
@@ -5739,6 +6018,25 @@ declare type TranslationShape<T> = {
 
 declare type TranslationsType = TranslationShape<typeof defaultTranslations>;
 
+declare interface TwoColumnsItemType {
+    title: string;
+    info: string | ReactNode;
+}
+
+export declare const TwoColumnsList: ForwardRefExoticComponent<TwoColumnsListType & RefAttributes<HTMLDivElement>>;
+
+declare interface TwoColumnsListType {
+    title?: string;
+    titleValue?: string;
+    titleTooltip?: {
+        label?: string;
+        description: string;
+    };
+    list: TwoColumnsItemType[];
+}
+
+declare type Type = "bar-chart" | "line-chart";
+
 declare namespace Types {
     export {
         ActionProps_3 as ActionProps,
@@ -5900,6 +6198,15 @@ export declare interface VersionAuthor {
     src?: string;
 }
 
+export declare const VerticalBarChartWidget: ForwardRefExoticComponent<Omit<WidgetProps_2 & {
+chart: VerticalBarChartProps;
+} & RefAttributes<HTMLDivElement>, "ref"> & RefAttributes<HTMLElement | SVGElement>>;
+
+declare const VerticalOverflowList: {
+    <T>({ items, renderListItem, className, gap, minSize, onVisibleItemsChange, }: OverflowListProps<T>): JSX_2.Element;
+    displayName: string;
+};
+
 declare type VisualizacionTypeDefinition<Props, Settings = Record<string, never>> = {
     render: (props: Props) => JSX.Element;
     name: string;
@@ -5959,7 +6266,7 @@ declare type VisualizationSettings = {
     [K in keyof typeof collectionVisualizations]: ExtractVisualizationSettings<(typeof collectionVisualizations)[K]>;
 };
 
-declare const Weekdays: ForwardRefExoticComponent<WeekdaysProps & RefAttributes<HTMLDivElement>>;
+export declare const Weekdays: ForwardRefExoticComponent<WeekdaysProps & RefAttributes<HTMLDivElement>>;
 
 declare interface WeekdaysProps {
     activatedDays?: number[];
@@ -5971,6 +6278,117 @@ declare type WelcomeScreenSuggestion = {
     message: string;
     prompt?: string;
 };
+
+export declare const Widget: default_2.ForwardRefExoticComponent<WidgetProps & {
+    children: ReactNode;
+} & default_2.RefAttributes<HTMLDivElement>> & {
+    Skeleton: default_2.ForwardRefExoticComponent<WidgetSkeletonProps & default_2.RefAttributes<HTMLDivElement>>;
+};
+
+export declare function WidgetAvatarsListItem({ id, title, subtitle, avatars, remainingCount, withPointerCursor, onClick, ...props }: WidgetAvatarsListItemProps): JSX_2.Element;
+
+export declare type WidgetAvatarsListItemProps = {
+    id: string | number;
+    title: string;
+    subtitle: string;
+    avatars: Omit<PersonAvatarVariant, "type">[] & Record<string, unknown>[];
+    remainingCount?: number;
+    withPointerCursor?: boolean;
+    onClick?: (id: string | number) => void;
+} & ({
+    emoji: string;
+} | {
+    alert: ComponentProps<typeof F0AvatarAlert>["type"];
+});
+
+export declare function WidgetEmptyState({ title, description, emoji, actions, }: WidgetEmptyStateProps): JSX_2.Element;
+
+export declare type WidgetEmptyStateProps = {
+    title: string;
+    description: string;
+    emoji?: string;
+    actions?: Action_2[];
+};
+
+export declare function WidgetHighlightButton({ label, count, icon, iconClassName, onClick, }: Props_5): JSX_2.Element;
+
+export declare function WidgetInboxList({ items, minSize, onClickItem, showAllItems, onVisibleItemsChange, }: Props_8): JSX_2.Element;
+
+export declare function WidgetInboxListItem({ id, title, subtitle, onClick, module, }: Props_6): JSX_2.Element;
+
+export declare type WidgetInboxListItemProps<Id extends string | number = string | number> = Props_6<Id>;
+
+export declare type WidgetInboxListProps = Props_8;
+
+export declare interface WidgetProps {
+    header?: {
+        title?: string;
+        subtitle?: string;
+        comment?: string;
+        info?: string;
+        canBeBlurred?: boolean;
+        link?: {
+            title: string;
+            url?: string;
+            onClick?: () => void;
+            icon?: IconType;
+        };
+        count?: number;
+    };
+    action?: F0ButtonProps;
+    summaries?: Array<{
+        label: string;
+        value: string | number;
+        prefixUnit?: string;
+        postfixUnit?: string;
+    }>;
+    alert?: string;
+    status?: {
+        text: string;
+        variant: StatusVariant;
+    };
+    fullHeight?: boolean;
+}
+
+export declare const WidgetSection: ForwardRefExoticComponent<    {
+children?: ReactNode | undefined;
+} & {
+title?: string;
+} & RefAttributes<HTMLDivElement>>;
+
+export declare function WidgetSimpleList({ items, gap, minSize, onClickItem, showAllItems, }: Props_9): JSX_2.Element;
+
+export declare function WidgetSimpleListItem({ id, title, alert, rawTag, count, icon, rightIcon, iconClassName, rightIconClassName, onClick, }: WidgetSimpleListItemProps): JSX_2.Element;
+
+export declare type WidgetSimpleListItemProps<Id extends string | number = string | number> = {
+    id: Id;
+    title: string;
+    icon?: IconType;
+    iconClassName?: string;
+    rightIcon?: IconType;
+    rightIconClassName?: string;
+    count?: number;
+    alert?: ComponentProps<typeof F0TagAlert>;
+    rawTag?: ComponentProps<typeof F0TagRaw>;
+    onClick?: (id: Id) => void;
+};
+
+export declare type WidgetSimpleListProps = Props_9;
+
+export declare type WidgetSkeletonProps = {
+    header?: {
+        title?: string;
+        subtitle?: string;
+    };
+} & (VariantProps<typeof skeletonVariants> | {
+    height: "full";
+});
+
+export declare const WidgetStrip: ForwardRefExoticComponent<DashboardProps_2 & RefAttributes<HTMLDivElement>> & {
+    Skeleton: () => JSX_2.Element;
+};
+
+declare type WidgetWidth = "sm" | "md" | "lg";
 
 declare type WithGroupId<RecordType> = RecordType & {
     [GROUP_ID_SYMBOL]: unknown | undefined;

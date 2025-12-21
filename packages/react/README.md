@@ -3,7 +3,7 @@ platform. Its core mission is to enhance consistency and coherence across
 Factorial's user interface, while ensuring a quick, efficient, and delightful
 user and developer experience.
 
-## Why F0?
+## Why F0? .
 
 As Factorial has evolved, it has expanded into a complex suite of features and
 functionalities, resulting in a fragmented user experience. Various sections of

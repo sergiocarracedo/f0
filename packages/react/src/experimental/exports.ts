@@ -31,7 +31,8 @@ export * from "./OnePagination"
 export * from "./Overlays/exports"
 export * from "./RichText/exports"
 export * from "./Utilities/exports"
-export * from "./Widgets/exports"
+//export * from "./Widgets/exports"
+export const MyNewExport = 1
 
 /**
  * @deprecated Use the `import { F0Select } from "@/factorialco/f0-react"`instead.

@@ -4378,6 +4378,9 @@ export declare type TeamAvatarVariant = Extract<AvatarVariant, {
 
 declare type TeamTagProps = ComponentProps<typeof F0TagTeam>;
 
+declare const test_2 = 1;
+export { test_2 as test }
+
 declare interface TextProps extends Omit<default_2.HTMLAttributes<HTMLElement>, "className">, default_2.RefAttributes<HTMLElement> {
     /**
      * Content to be rendered

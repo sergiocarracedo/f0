@@ -20,7 +20,9 @@ jobs:
       - name: Analyze TypeScript Exports
         uses: sergiocarracedo/ts-export-info-action@v1
         with:
-          path: 'packages/react/src/f0.ts'            
+          path: |
+            packages/react/src/f0.ts
+            packages/react/src/experimental.ts            
           detailed: true  # Set to true for detailed export list
           compare: true # Set to true to compare agains base
           list-changes: true # Set to true list the changes (needs compare true)

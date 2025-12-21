@@ -18,7 +18,7 @@ jobs:
           node-version: '20'
 
       - name: Analyze TypeScript Exports
-        uses: sergio-carracedo/ts-exported-info-action@v1
+        uses: sergiocarracedo/ts-exported-info-action@v1
         with:
           path: 'src/f0.ts'            
           detailed: true  # Set to true for detailed export list

@@ -1,0 +1,27 @@
+name: Analyze Exports
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  analyze-exports:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Important: fetch full history for comparison
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Analyze TypeScript Exports
+        uses: sergio-carracedo/ts-exported-info-action@v1
+        with:
+          path: 'src/f0.ts'            
+          detailed: true  # Set to true for detailed export list
+          compare: true # Set to true to compare agains base
+          list-changes: true # Set to true list the changes (needs compare true)
+          github-token: ${{ secrets.GITHUB_TOKEN }}

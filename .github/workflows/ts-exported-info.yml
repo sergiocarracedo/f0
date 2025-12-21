@@ -17,7 +17,7 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Analyze TypeScript Exports
+      - name: Analyze TypeScript Exports 2
         uses: sergiocarracedo/ts-export-info-action@v1.0.3
         with:
           path: |

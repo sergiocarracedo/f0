@@ -23,6 +23,9 @@ export * from "./tags/exports"
 export * from "./Utilities/Await"
 export * from "./Utilities/F0GridStack"
 export * from "./F0TableOfContentPopover"
-export * from "./UpsellingKit/exports"
+/**
+ * @deprecated UpsellingKit has moved to @/sds/UpsellingKit. Import from there instead.
+ */
+export * from "../sds/UpsellingKit/exports"
 // AI Components
 export * from "../ai/exports"

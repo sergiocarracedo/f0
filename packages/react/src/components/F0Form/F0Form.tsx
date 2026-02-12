@@ -1,10 +1,12 @@
-import { useMemo } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { DefaultValues, Path, useForm } from "react-hook-form"
 import { z, ZodRawShape } from "zod"
 
 import { F0Button } from "@/components/F0Button"
 import { F0Icon } from "@/components/F0Icon"
 import { F0ActionBar } from "@/experimental/F0ActionBar"
+import { F0TableOfContent } from "@/experimental/Navigation/F0TableOfContent"
+import { TOCItem } from "@/experimental/Navigation/F0TableOfContent/types"
 import { AlertCircle, ChevronDown, ChevronUp, Delete, Save } from "@/icons/app"
 import { useI18n } from "@/lib/providers/i18n/i18n-provider"
 import { cn } from "@/lib/utils"
@@ -14,8 +16,8 @@ import { RowRenderer } from "./components/RowRenderer"
 import { SectionRenderer } from "./components/SectionRenderer"
 import { SwitchGroupRenderer } from "./components/SwitchGroupRenderer"
 import { createConditionalResolver } from "./conditionalResolver"
-import { FIELD_GAP, SECTION_MARGIN } from "./constants"
-import { F0FormContext } from "./context"
+import { FORM_MAX_WIDTH, SECTION_MARGIN } from "./constants"
+import { F0FormContext, generateAnchorId } from "./context"
 import { FieldRenderer } from "./fields/FieldRenderer"
 import type { F0SwitchField } from "./fields/switch/types"
 import type {
@@ -139,7 +141,11 @@ export function F0Form<TSchema extends z.ZodObject<ZodRawShape>>(
     submitConfig,
     className,
     errorTriggerMode = "on-blur",
+    styling,
   } = props
+
+  // Resolve styling configuration
+  const showSectionsSidepanel = styling?.showSectionsSidepanel ?? false
 
   // Resolve submit type from config
   const isActionBar = submitConfig?.type === "action-bar"
@@ -181,6 +187,42 @@ export function F0Form<TSchema extends z.ZodObject<ZodRawShape>>(
 
   // Convert schema to internal definition structure for rendering
   const definition = useSchemaDefinition(schema, sections)
+
+  // Extract section IDs from the definition for TOC
+  const sectionIds = useMemo(() => {
+    return definition
+      .filter((item): item is SectionDefinition => item.type === "section")
+      .map((section) => section.id)
+  }, [definition])
+
+  // Track active section (the last clicked section)
+  const [activeSection, setActiveSection] = useState<string | undefined>(
+    sectionIds[0]
+  )
+
+  // Scroll to section when TOC item is clicked and mark it as active
+  const handleSectionClick = useCallback(
+    (sectionId: string) => {
+      setActiveSection(sectionId)
+      const anchorId = generateAnchorId(name, sectionId)
+      const element = document.getElementById(anchorId)
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "start" })
+      }
+    },
+    [name]
+  )
+
+  // Convert sections to TOCItems for the TableOfContent component
+  const tocItems: TOCItem[] = useMemo(() => {
+    if (!sections || !showSectionsSidepanel) return []
+
+    return sectionIds.map((sectionId) => ({
+      id: sectionId,
+      label: sections[sectionId]?.title ?? sectionId,
+      onClick: () => handleSectionClick(sectionId),
+    }))
+  }, [sections, sectionIds, showSectionsSidepanel, handleSectionClick])
 
   // Create custom error map for localized validation messages
   const errorMap = useMemo(() => createZodErrorMap(i18n), [i18n])
@@ -247,69 +289,96 @@ export function F0Form<TSchema extends z.ZodObject<ZodRawShape>>(
   // Context value for anchor links
   const contextValue = useMemo(() => ({ formName: name }), [name])
 
+  // Form content component to avoid repetition
+  const formContent = (
+    <form
+      onSubmit={form.handleSubmit(handleSubmit)}
+      className={cn("flex flex-col", FORM_MAX_WIDTH, className)}
+    >
+      {/* Render definition items with switch grouping */}
+      {groupedItems.map((groupedItem, index) => {
+        // Apply field gap margin to non-section items (sections have their own margin)
+        const fieldGapClass =
+          index !== 0 && groupedItem.type !== "section" ? "mt-4" : ""
+
+        switch (groupedItem.type) {
+          case "switchGroup":
+            return (
+              <div key={`switch-group-${index}`} className={fieldGapClass}>
+                <SwitchGroupRenderer fields={groupedItem.fields} />
+              </div>
+            )
+          case "field":
+            return (
+              <div key={groupedItem.item.field.id} className={fieldGapClass}>
+                <FieldRenderer field={groupedItem.item.field} />
+              </div>
+            )
+          case "row":
+            return (
+              <div key={`row-${groupedItem.index}`} className={fieldGapClass}>
+                <RowRenderer row={groupedItem.item} />
+              </div>
+            )
+          case "section":
+            return (
+              <div
+                key={groupedItem.item.id}
+                className={index !== 0 ? SECTION_MARGIN : ""}
+              >
+                <SectionRenderer section={groupedItem.item} />
+              </div>
+            )
+          default:
+            return null
+        }
+      })}
+
+      {/* Root error message */}
+      {rootError && (
+        <p className="mt-4 text-base font-medium text-f1-foreground-critical">
+          {rootError.message}
+        </p>
+      )}
+
+      {/* Default submit button */}
+      {!isActionBar && showSubmitButton && (
+        <div className="mt-4">
+          <F0Button
+            type="submit"
+            label={submitLabel}
+            icon={submitIcon}
+            loading={isSubmitting}
+            disabled={hasErrors}
+          />
+        </div>
+      )}
+    </form>
+  )
+
   return (
     <F0FormContext.Provider value={contextValue}>
       <FormProvider {...form}>
-        <form
-          onSubmit={form.handleSubmit(handleSubmit)}
-          className={cn(`flex flex-col ${FIELD_GAP} max-w-[600px]`, className)}
-        >
-          {/* Render definition items with switch grouping */}
-          {groupedItems.map((groupedItem, index) => {
-            switch (groupedItem.type) {
-              case "switchGroup":
-                return (
-                  <SwitchGroupRenderer
-                    key={`switch-group-${index}`}
-                    fields={groupedItem.fields}
-                  />
-                )
-              case "field":
-                return (
-                  <FieldRenderer
-                    key={groupedItem.item.field.id}
-                    field={groupedItem.item.field}
-                  />
-                )
-              case "row":
-                return (
-                  <RowRenderer
-                    key={`row-${groupedItem.index}`}
-                    row={groupedItem.item}
-                  />
-                )
-              case "section":
-                return (
-                  <div
-                    key={groupedItem.item.id}
-                    className={index !== 0 ? SECTION_MARGIN : ""}
-                  >
-                    <SectionRenderer section={groupedItem.item} />
-                  </div>
-                )
-              default:
-                return null
-            }
-          })}
+        {showSectionsSidepanel && tocItems.length > 0 ? (
+          <div className="flex w-full gap-4">
+            {/* Sections sidebar */}
+            <div className="shrink-0 sticky top-4 h-fit self-start pt-3">
+              <F0TableOfContent
+                items={tocItems}
+                activeItem={activeSection}
+                scrollable={false}
+              />
+            </div>
 
-          {/* Root error message */}
-          {rootError && (
-            <p className="text-base font-medium text-f1-foreground-critical">
-              {rootError.message}
-            </p>
-          )}
+            {/* Separator */}
+            <div className="w-px bg-f1-border-secondary" />
 
-          {/* Default submit button */}
-          {!isActionBar && showSubmitButton && (
-            <F0Button
-              type="submit"
-              label={submitLabel}
-              icon={submitIcon}
-              loading={isSubmitting}
-              disabled={hasErrors}
-            />
-          )}
-        </form>
+            {/* Form content - centered in available space */}
+            <div className="flex flex-1 justify-center">{formContent}</div>
+          </div>
+        ) : (
+          formContent
+        )}
 
         {/* Action bar submit - rendered outside form to prevent accidental form submission */}
         {isActionBar && (

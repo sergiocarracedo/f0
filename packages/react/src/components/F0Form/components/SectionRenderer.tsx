@@ -1,6 +1,8 @@
 import { useFormContext } from "react-hook-form"
 
+import { F0Button } from "@/components/F0Button"
 import { SectionHeader } from "@/experimental/Information/Headers/SectionHeader"
+import { cn } from "@/lib/utils"
 
 import { FIELD_GAP } from "../constants"
 import { generateAnchorId, useF0FormContext } from "../context"
@@ -83,7 +85,7 @@ export function SectionRenderer({ section }: SectionRendererProps) {
   const values = form.watch()
   const { formName } = useF0FormContext()
 
-  const { title, description, renderIf, fields } = section.section
+  const { title, description, renderIf, action, fields } = section.section
   const sectionId = section.id
 
   // Check if section should be rendered based on renderIf condition
@@ -98,8 +100,23 @@ export function SectionRenderer({ section }: SectionRendererProps) {
 
   return (
     <section id={anchorId} className="flex flex-col scroll-mt-4">
-      <div className="[&>div]:px-0.5 [&>div]:mx-0 [&>div]:border-0 py-5">
+      <div
+        className={cn(
+          "flex items-start justify-between py-5",
+          "[&>div]:px-0.5 [&>div]:mx-0 [&>div]:border-0"
+        )}
+      >
         <SectionHeader title={title} description={description ?? ""} />
+        {action && (
+          <F0Button
+            label={action.label}
+            icon={action.icon}
+            onClick={action.onClick}
+            href={action.href}
+            variant="outline"
+            size="md"
+          />
+        )}
       </div>
       <div className={`flex flex-col ${FIELD_GAP}`}>
         {groupedItems.map((item, index) => {

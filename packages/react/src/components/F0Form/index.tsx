@@ -8,7 +8,9 @@ export type {
   F0FormErrorTriggerMode,
   F0FormSubmitConfig,
   F0FormDiscardConfig,
+  F0FormStylingConfig,
   F0SectionConfig,
+  F0SectionAction,
   F0FormSubmitResult,
   SectionRenderIf,
 } from "./types"

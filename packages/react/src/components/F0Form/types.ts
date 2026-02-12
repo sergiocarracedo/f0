@@ -21,6 +21,21 @@ export type SectionRenderIf =
   | ((values: Record<string, unknown>) => boolean)
 
 /**
+ * Action button configuration for a section.
+ * Provide either onClick for a button action or href for a link.
+ */
+export interface F0SectionAction {
+  /** Button label */
+  label: string
+  /** Button icon */
+  icon?: IconType
+  /** Click handler (use this or href) */
+  onClick?: () => void
+  /** Link URL (use this or onClick) */
+  href?: string
+}
+
+/**
  * Configuration for a form section.
  * Section order is determined by declaration order in the sections object.
  */
@@ -31,6 +46,8 @@ export interface F0SectionConfig {
   description?: string
   /** Conditional rendering for the entire section */
   renderIf?: SectionRenderIf
+  /** Optional action button for the section */
+  action?: F0SectionAction
 }
 
 // ============================================================================
@@ -69,6 +86,8 @@ export interface SectionDefinition {
     description?: string
     /** Conditional rendering for the entire section */
     renderIf?: SectionRenderIf
+    /** Optional action button for the section */
+    action?: F0SectionAction
     /** Fields and rows within this section */
     fields: (FieldItem | RowDefinition)[]
   }
@@ -163,6 +182,17 @@ export type F0FormSubmitConfig =
   | F0FormActionBarSubmitConfig
 
 /**
+ * Styling configuration for the form layout and appearance
+ */
+export interface F0FormStylingConfig {
+  /**
+   * Shows a sidebar with section navigation (Table of Contents)
+   * @default false
+   */
+  showSectionsSidepanel?: boolean
+}
+
+/**
  * Props for the F0Form component
  *
  * @typeParam TSchema - The Zod object schema type. The form data type is inferred from this.
@@ -220,6 +250,11 @@ export interface F0FormProps<TSchema extends z.ZodObject<ZodRawShape>> {
    * @default "on-blur"
    */
   errorTriggerMode?: F0FormErrorTriggerMode
+  /**
+   * Styling configuration for form layout and appearance.
+   * Controls section sidebar visibility and box wrapping.
+   */
+  styling?: F0FormStylingConfig
 }
 
 /**

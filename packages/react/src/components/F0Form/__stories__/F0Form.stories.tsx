@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import { z } from "zod"
 
 import { createDataSourceDefinition } from "@/hooks/datasource"
+import { ExternalLink, Settings } from "@/icons/app"
 
 import {
   f0FormField,
@@ -165,6 +166,11 @@ export const WithSections: Story = {
       preferences: {
         title: "Preferences",
         description: "Configure your account preferences",
+        action: {
+          label: "Go to settings",
+          icon: Settings,
+          href: "#settings",
+        },
       },
     }
 
@@ -186,6 +192,146 @@ export const WithSections: Story = {
           alert(`Form submitted: ${JSON.stringify(data, null, 2)}`)
           return { success: true }
         }}
+      />
+    )
+  },
+}
+
+/**
+ * Form with a sections sidebar.
+ * Use the `styling` prop to configure the layout:
+ * - `showSectionsSidepanel`: Shows a sidebar with section navigation
+ */
+export const WithSectionsSidepanel: Story = {
+  render() {
+    const formSchema = z.object({
+      // Basic Information
+      title: f0FormField(z.string().min(1), {
+        label: "Title",
+        section: "basic",
+        placeholder: "Enter survey title",
+      }),
+      description: f0FormField(z.string().max(500).optional(), {
+        label: "Description (Optional)",
+        section: "basic",
+        fieldType: "textarea",
+        rows: 3,
+      }),
+      // Participants
+      participants: f0FormField(z.string(), {
+        label: "Select participants",
+        section: "participants",
+        options: [
+          { value: "all", label: "All employees" },
+          { value: "department", label: "By department" },
+          { value: "custom", label: "Custom selection" },
+        ],
+        placeholder: "Select participants",
+      }),
+      // Schedule
+      publishOn: f0FormField(z.date().optional(), {
+        label: "Publish on",
+        section: "schedule",
+        row: "schedule-dates",
+      }),
+      endsAt: f0FormField(z.date().optional(), {
+        label: "Ends at",
+        section: "schedule",
+        row: "schedule-dates",
+      }),
+      recurrence: f0FormField(z.string(), {
+        label: "Recurrence",
+        section: "schedule",
+        options: [
+          { value: "none", label: "Does not repeat" },
+          { value: "weekly", label: "Weekly" },
+          { value: "monthly", label: "Monthly" },
+          { value: "quarterly", label: "Quarterly" },
+        ],
+      }),
+      // Visibility & Privacy
+      managerVisibility: f0FormField(z.boolean(), {
+        label: "Add visibility permissions to managers and team leads",
+        helpText:
+          "Grant access to managers and team leads. Even if they are not survey editors, they will be able to view the results of their own teams once responses are available",
+        section: "visibility",
+        fieldType: "switch",
+      }),
+      anonymousAnswers: f0FormField(z.boolean(), {
+        label: "Anonymous answers",
+        section: "visibility",
+        fieldType: "switch",
+      }),
+      // Editors
+      editors: f0FormField(z.string(), {
+        label: "Select editors",
+        section: "editors",
+        options: [
+          { value: "none", label: "None" },
+          { value: "admins", label: "Administrators only" },
+          { value: "custom", label: "Custom selection" },
+        ],
+        placeholder: "Select editors",
+      }),
+    })
+
+    const sections: Record<string, F0SectionConfig> = {
+      basic: {
+        title: "Basic Information",
+      },
+      participants: {
+        title: "Participants",
+        description: "Choose who will receive this survey",
+        action: {
+          label: "Manage groups",
+          icon: ExternalLink,
+          href: "#groups",
+        },
+      },
+      schedule: {
+        title: "Schedule",
+      },
+      visibility: {
+        title: "Visibility & Privacy",
+        description:
+          "Configure the visibility and privacy settings for this survey",
+        action: {
+          label: "Privacy settings",
+          icon: Settings,
+          onClick: () => alert("Opening privacy settings..."),
+        },
+      },
+      editors: {
+        title: "Editors",
+      },
+    }
+
+    return (
+      <F0Form
+        name="survey-settings"
+        schema={formSchema}
+        sections={sections}
+        styling={{
+          showSectionsSidepanel: true,
+        }}
+        defaultValues={{
+          title: "Workplace climate survey",
+          description:
+            "This short workplace climate survey contains just 12 simple questions. It is designed to help measure employees' perceptions, experiences, and overall satisfaction within the workplace.",
+          participants: "",
+          publishOn: undefined,
+          endsAt: undefined,
+          recurrence: "none",
+          managerVisibility: false,
+          anonymousAnswers: false,
+          editors: "none",
+        }}
+        onSubmit={async (data) => {
+          await sleep(1000)
+          alert(`Form submitted: ${JSON.stringify(data, null, 2)}`)
+          return { success: true }
+        }}
+        submitConfig={{ label: "Save Survey" }}
       />
     )
   },
@@ -377,6 +523,166 @@ export const AllFieldTypes: Story = {
           dateField: undefined,
           dateRangeField: undefined,
           richTextField: { value: null },
+        }}
+        onSubmit={async (data) => {
+          await sleep(1000)
+          alert(`Form submitted: ${JSON.stringify(data, null, 2)}`)
+          return { success: true }
+        }}
+      />
+    )
+  },
+}
+
+/**
+ * Form demonstrating all available field types in disabled state.
+ * Each field has `disabled: true` and is pre-filled with sample values.
+ */
+export const AllFieldTypesDisabled: Story = {
+  render() {
+    const formSchema = z.object({
+      textField: f0FormField(z.string().min(1), {
+        label: "Text Field",
+        placeholder: "Regular text input",
+        disabled: true,
+      }),
+      emailField: f0FormField(z.string().email(), {
+        label: "Email Field",
+        disabled: true,
+      }),
+      passwordField: f0FormField(z.string().min(8), {
+        label: "Password Field",
+        placeholder: "Enter password",
+        inputType: "password",
+        disabled: true,
+      }),
+      numberField: f0FormField(z.number().min(0).max(100), {
+        label: "Number Field",
+        step: 1,
+        disabled: true,
+      }),
+      textareaField: f0FormField(z.string().max(500), {
+        label: "Textarea Field",
+        fieldType: "textarea",
+        rows: 3,
+        placeholder: "Enter long text...",
+        disabled: true,
+      }),
+      selectField: f0FormField(z.enum(["option1", "option2", "option3"]), {
+        label: "Select Field",
+        options: [
+          { value: "option1", label: "Option 1" },
+          { value: "option2", label: "Option 2" },
+          { value: "option3", label: "Option 3" },
+        ],
+        placeholder: "Select an option",
+        showSearchBox: true,
+        disabled: true,
+      }),
+      multiSelectField: f0FormField(z.array(z.enum(["a", "b", "c"])).min(1), {
+        label: "Multi-Select Field",
+        multiple: true,
+        options: [
+          { value: "a", label: "Option A" },
+          { value: "b", label: "Option B" },
+          { value: "c", label: "Option C" },
+        ],
+        placeholder: "Select multiple options",
+        disabled: true,
+      }),
+      urlField: f0FormField(z.string().url(), {
+        label: "URL Field",
+        disabled: true,
+      }),
+      checkboxField: f0FormField(z.boolean(), {
+        label: "Checkbox Field",
+        fieldType: "checkbox",
+        helpText: "Check this box to agree",
+        disabled: true,
+      }),
+      requiredCheckboxField: f0FormField(z.literal(true), {
+        label: "Required Checkbox Field",
+        fieldType: "checkbox",
+        helpText: "Check this box to agree",
+        disabled: true,
+      }),
+      switchField: f0FormField(z.boolean(), {
+        label: "Switch Field",
+        fieldType: "switch",
+        helpText: "Toggle this switch",
+        disabled: true,
+      }),
+      requiredSwitchField: f0FormField(z.literal(true), {
+        label: "Required Switch Field",
+        fieldType: "switch",
+        helpText: "Toggle this switch",
+        disabled: true,
+      }),
+      dateField: f0FormField(z.date(), {
+        label: "Date Field",
+        placeholder: "Select a date",
+        granularities: ["day"],
+        disabled: true,
+      }),
+      dateRangeField: f0FormField(
+        z
+          .object({
+            from: z.date(),
+            to: z.date(),
+          })
+          .optional(),
+        {
+          label: "Date Range Field",
+          placeholder: "Select date range",
+          fieldType: "daterange",
+          fromLabel: "Start",
+          toLabel: "End",
+          disabled: true,
+        }
+      ),
+      richTextField: f0FormField(
+        z.object({
+          value: z.string().nullable(),
+          mentionIds: z.array(z.number()).optional(),
+        }),
+        {
+          label: "Rich Text Field",
+          fieldType: "richtext",
+          placeholder: "Write something with formatting...",
+          maxCharacters: 1000,
+          height: "sm",
+          plainHtmlMode: true,
+          disabled: true,
+        }
+      ),
+    })
+
+    return (
+      <F0Form
+        name="all-field-types-disabled"
+        schema={formSchema}
+        defaultValues={{
+          textField: "Sample text value",
+          emailField: "user@example.com",
+          passwordField: "secretpassword",
+          numberField: 42,
+          textareaField:
+            "This is a longer piece of text that demonstrates the textarea field in its disabled state.",
+          selectField: "option2",
+          multiSelectField: ["a", "b"],
+          urlField: "https://example.com",
+          checkboxField: true,
+          requiredCheckboxField: true,
+          switchField: true,
+          requiredSwitchField: true,
+          dateField: new Date("2024-06-15"),
+          dateRangeField: {
+            from: new Date("2024-01-01"),
+            to: new Date("2024-12-31"),
+          },
+          richTextField: {
+            value: "<p>This is <strong>rich text</strong> content.</p>",
+          },
         }}
         onSubmit={async (data) => {
           await sleep(1000)

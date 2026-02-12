@@ -470,10 +470,20 @@ export const AllFieldTypes: Story = {
         fieldType: "switch",
         helpText: "Toggle this switch",
       }),
-      dateField: f0FormField(z.date(), {
+      dateField: f0FormField(z.date().optional(), {
         label: "Date Field",
         placeholder: "Select a date",
         granularities: ["day"],
+      }),
+      timeField: f0FormField(z.date().optional(), {
+        label: "Time Field",
+        fieldType: "time",
+        helpText: "Select a time (HH:mm)",
+      }),
+      datetimeField: f0FormField(z.date().optional(), {
+        label: "DateTime Field",
+        fieldType: "datetime",
+        helpText: "Select date and time",
       }),
       dateRangeField: f0FormField(
         z
@@ -521,6 +531,8 @@ export const AllFieldTypes: Story = {
           checkboxField: false,
           switchField: false,
           dateField: undefined,
+          timeField: undefined,
+          datetimeField: undefined,
           dateRangeField: undefined,
           richTextField: { value: null },
         }}
@@ -618,10 +630,22 @@ export const AllFieldTypesDisabled: Story = {
         helpText: "Toggle this switch",
         disabled: true,
       }),
-      dateField: f0FormField(z.date(), {
+      dateField: f0FormField(z.date().optional(), {
         label: "Date Field",
         placeholder: "Select a date",
         granularities: ["day"],
+        disabled: true,
+      }),
+      timeField: f0FormField(z.date(), {
+        label: "Time Field",
+        fieldType: "time",
+        helpText: "Select a time (HH:mm)",
+        disabled: true,
+      }),
+      datetimeField: f0FormField(z.date(), {
+        label: "DateTime Field",
+        fieldType: "datetime",
+        helpText: "Select date and time",
         disabled: true,
       }),
       dateRangeField: f0FormField(
@@ -676,6 +700,8 @@ export const AllFieldTypesDisabled: Story = {
           switchField: true,
           requiredSwitchField: true,
           dateField: new Date("2024-06-15"),
+          timeField: new Date("2024-06-15T14:30:00"),
+          datetimeField: new Date("2024-06-15T14:30:00"),
           dateRangeField: {
             from: new Date("2024-01-01"),
             to: new Date("2024-12-31"),

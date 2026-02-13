@@ -17,6 +17,11 @@ export {
   inferFieldType,
 } from "./f0Schema"
 
+// Re-export useF0Form hook and types
+export { useF0Form } from "./useF0Form"
+import type { F0FormRef } from "./useF0Form"
+export type { F0FormRef, UseF0FormReturn } from "./useF0Form"
+
 /**
  * Conditional rendering for sections - can be a condition object or a function
  */
@@ -151,6 +156,12 @@ interface F0FormDefaultSubmitConfig extends F0FormSubmitConfigBase {
    * @default "default"
    */
   type?: "default"
+  /**
+   * When true, hides the submit button.
+   * Useful when using `useF0Form` hook to submit from outside the form.
+   * @default false
+   */
+  hideSubmitButton?: boolean
 }
 
 /**
@@ -257,6 +268,19 @@ export interface F0FormProps<TSchema extends z.ZodObject<ZodRawShape>> {
    * Controls section sidebar visibility and box wrapping.
    */
   styling?: F0FormStylingConfig
+  /**
+   * Ref to control the form programmatically from outside.
+   * Use with the `useF0Form` hook to get a ref and submit/reset functions.
+   *
+   * @example
+   * ```tsx
+   * const { formRef, submit } = useF0Form()
+   *
+   * <F0Form formRef={formRef} ... />
+   * <Button onClick={submit}>Submit</Button>
+   * ```
+   */
+  formRef?: React.MutableRefObject<F0FormRef | null>
 }
 
 /**

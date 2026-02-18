@@ -255,6 +255,7 @@ export const defaultTranslations = {
     inputPlaceholder:
       "Ask about time, people, or company info and a lot of other things...",
     stopAnswerGeneration: "Stop generating",
+    responseStopped: "You stopped this response",
     sendMessage: "Send message",
     thoughtsGroupTitle: "Reflection",
     resourcesGroupTitle: "Resources",
@@ -273,6 +274,8 @@ export const defaultTranslations = {
         placeholder: "Share what didn’t work",
       },
     },
+    expandChat: "Expand chat",
+    collapseChat: "Collapse chat",
     ask: "Ask One",
     growth: {
       demoCard: {

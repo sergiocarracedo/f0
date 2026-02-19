@@ -1,8 +1,12 @@
-import { Counter } from "@/experimental/Information/Counter"
-import { Preset } from "@/experimental/OnePreset"
+import { useMemo } from "react"
+
+import { Await } from "@/components/Utilities/Await"
+import { Counter } from "@/ui/Counter"
+import { Preset } from "@/ui/OnePreset"
 import { cn, focusRing } from "@/lib/utils"
 import { OverflowList } from "@/ui/OverflowList"
 import { Skeleton } from "@/ui/skeleton"
+
 import { FiltersDefinition, FiltersState, PresetsDefinition } from "../types"
 
 interface FilterPresetsProps<Filters extends FiltersDefinition> {
@@ -20,27 +24,42 @@ export const FiltersPresets = <Filters extends FiltersDefinition>({
   onPresetsChange,
   presetsLoading = false,
 }: FilterPresetsProps<Filters>) => {
+  // Ensure value is always a valid object, never null or undefined
+  const safeValue = useMemo(() => {
+    return value != null && typeof value === "object" && !Array.isArray(value)
+      ? value
+      : ({} as FiltersState<Filters>)
+  }, [value])
+
   /**
    * Computes the selection state and click handler for a preset.
    * Presets merge with current filters when selected and remove only their keys when deselected.
    */
   const getPresetState = (preset: NonNullable<typeof presets>[number]) => {
+    // Ensure preset.filter is always a valid object, never null or undefined
+    const safePresetFilter =
+      preset.filter != null &&
+      typeof preset.filter === "object" &&
+      !Array.isArray(preset.filter)
+        ? preset.filter
+        : ({} as FiltersState<Filters>)
+
     // Check if all preset filters are present in current value
-    const isSelected = Object.entries(preset.filter).every(
-      ([key, val]) => JSON.stringify(value[key]) === JSON.stringify(val)
+    const isSelected = Object.entries(safePresetFilter).every(
+      ([key, val]) => JSON.stringify(safeValue[key]) === JSON.stringify(val)
     )
 
     const handleClick = () => {
       if (isSelected) {
         // Remove only preset's keys from current filters
-        const newFilters = { ...value }
-        Object.keys(preset.filter).forEach((key) => {
+        const newFilters = { ...safeValue }
+        Object.keys(safePresetFilter).forEach((key) => {
           delete newFilters[key as keyof typeof newFilters]
         })
         onPresetsChange?.(newFilters)
       } else {
         // Merge preset's filter with current filters
-        onPresetsChange?.({ ...value, ...preset.filter })
+        onPresetsChange?.({ ...safeValue, ...safePresetFilter })
       }
     }
 
@@ -53,15 +72,16 @@ export const FiltersPresets = <Filters extends FiltersDefinition>({
     isVisible = true
   ) => {
     const { isSelected, handleClick } = getPresetState(preset)
+    const presetNumber = preset.itemsCount?.(safeValue)
 
     return (
       <Preset
-        key={index}
+        key={`${preset.label}-${index}`}
         label={preset.label}
         selected={isSelected}
         onClick={handleClick}
         data-visible={isVisible}
-        number={preset.itemsCount?.(value) ?? undefined}
+        number={presetNumber}
       />
     )
   }
@@ -71,10 +91,11 @@ export const FiltersPresets = <Filters extends FiltersDefinition>({
     index: number
   ) => {
     const { isSelected, handleClick } = getPresetState(preset)
+    const presetNumber = preset.itemsCount?.(safeValue)
 
     return (
       <button
-        key={index}
+        key={`${preset.label}-${index}`}
         className={cn(
           "flex w-full cursor-pointer items-center justify-between rounded-sm p-2 text-left font-medium text-f1-foreground hover:bg-f1-background-secondary",
           isSelected &&
@@ -85,10 +106,21 @@ export const FiltersPresets = <Filters extends FiltersDefinition>({
         data-visible={true}
       >
         {preset.label}
-        <Counter
-          value={Object.keys(preset.filter).length}
-          type={isSelected ? "selected" : "default"}
-        />
+        {presetNumber !== undefined && (
+          <Await
+            resolve={presetNumber}
+            fallback={<Skeleton className="h-4 w-6" />}
+          >
+            {(number) =>
+              number !== undefined && (
+                <Counter
+                  value={number}
+                  type={isSelected ? "selected" : "default"}
+                />
+              )
+            }
+          </Await>
+        )}
       </button>
     )
   }
@@ -112,6 +144,18 @@ export const FiltersPresets = <Filters extends FiltersDefinition>({
     </div>
   )
 
+  // Filter out presets with invalid filters
+  const validPresets = useMemo(() => {
+    if (!presets || presets.length === 0) return []
+    return presets.filter(
+      (preset) =>
+        preset &&
+        preset.filter != null &&
+        typeof preset.filter === "object" &&
+        !Array.isArray(preset.filter)
+    )
+  }, [presets])
+
   // Show skeleton when loading
   if (presetsLoading) {
     const skeletonItems = Array.from(
@@ -129,10 +173,9 @@ export const FiltersPresets = <Filters extends FiltersDefinition>({
   }
 
   return (
-    presets &&
-    presets.length > 0 && (
+    validPresets.length > 0 && (
       <OverflowList
-        items={presets}
+        items={validPresets}
         renderListItem={renderListPresetItem}
         renderDropdownItem={renderDropdownPresetItem}
         className="min-w-0 flex-1"

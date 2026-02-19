@@ -1,5 +1,6 @@
 import type { AvatarVariant } from "@/components/avatars/F0Avatar"
 import type { IconType } from "@/components/F0Icon"
+import type { NewColor } from "@/components/tags/F0TagDot/types"
 import type {
   DataSourceDefinition,
   FiltersDefinition,
@@ -10,7 +11,9 @@ import type {
   SelectedItemsState,
   SortingsDefinition,
 } from "@/hooks/datasource"
+
 import { INPUTFIELD_SIZES, InputFieldProps } from "@/ui/InputField"
+
 import { Action } from "./components/SelectBottomActions"
 
 // Helper type to resolve the actual record type
@@ -42,6 +45,11 @@ type F0SelectBaseProps<T extends string, R = unknown> = {
   actions?: Action[]
   /** Container element to render the portal content into */
   portalContainer?: HTMLElement | null
+  /**
+   * When true, renders the select as a static list without the input trigger.
+   * Only displays the dropdown content with max height, border and scroll.
+   */
+  asList?: boolean
 }
 
 /**
@@ -154,13 +162,17 @@ export type F0SelectProps<T extends string, R = unknown> = F0SelectBaseProps<
     | "hint"
   >
 
+export type F0SelectTagProp =
+  | string
+  | { type: "dot"; text: string; color: NewColor }
+
 export type F0SelectItemObject<T, R = unknown> = {
   type?: "item"
   value: T
   label: string
   description?: string
   avatar?: AvatarVariant
-  tag?: string
+  tag?: F0SelectTagProp
   icon?: IconType
   item?: R
   disabled?: boolean

@@ -1,4 +1,7 @@
-import { AIButton as AIButtonComponent } from "@/components/AIButton"
+import { AnimatePresence, motion } from "motion/react"
+import { useEffect, useState, type ReactNode } from "react"
+
+import { AIButton as AIButtonComponent } from "@/sds/ai/AIButton"
 import { F0Icon } from "@/components/F0Icon"
 import { F0Text } from "@/components/F0Text"
 import {
@@ -11,8 +14,7 @@ import { useI18n } from "@/lib/providers/i18n"
 import { withSkeleton } from "@/lib/skeleton"
 import { cn } from "@/lib/utils"
 import { Skeleton } from "@/ui/skeleton"
-import { AnimatePresence, motion } from "motion/react"
-import { useEffect, useState, type ReactNode } from "react"
+
 import { ButtonInternal } from "../F0Button/internal"
 
 export interface WidgetProps {

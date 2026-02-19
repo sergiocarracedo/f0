@@ -1,10 +1,12 @@
+import { Observable } from "zen-observable-ts"
+
 import {
   FiltersDefinition,
   FiltersState,
 } from "@/components/OneFilterPicker/types"
 import { SortingsStateMultiple } from "@/hooks/datasource/types/sortings.typings"
 import { PromiseState } from "@/lib/promise-to-observable"
-import { Observable } from "zen-observable-ts"
+
 import { RecordType } from "./records.typings"
 
 /**
@@ -166,8 +168,8 @@ export type BaseDataAdapter<
 export type PaginatedDataAdapter<
   R extends RecordType,
   Filters extends FiltersDefinition,
-  Options extends
-    PaginatedFetchOptions<Filters> = PaginatedFetchOptions<Filters>,
+  Options extends PaginatedFetchOptions<Filters> =
+    PaginatedFetchOptions<Filters>,
   FetchReturn = PaginatedResponse<R>,
 > = {
   /** Indicates this adapter uses page-based pagination */

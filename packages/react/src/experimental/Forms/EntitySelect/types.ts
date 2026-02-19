@@ -1,5 +1,7 @@
-import { InputFieldProps } from "@/ui/InputField"
 import { PopoverProps } from "@radix-ui/react-popover"
+
+import { InputFieldProps } from "@/ui/InputField"
+
 import { Action } from "../../../components/F0Select/components/SelectBottomActions"
 
 export type EntitySelectSubEntity = {
@@ -7,6 +9,7 @@ export type EntitySelectSubEntity = {
   subName: string
   subAvatar?: string
   subSearchKeys?: string[]
+  subDeactivated?: boolean
 }
 
 export type EntitySelectEntity = {
@@ -15,6 +18,7 @@ export type EntitySelectEntity = {
   avatar?: string
   expanded?: boolean
   searchKeys?: string[]
+  deactivated?: boolean
   subItems?: EntitySelectSubEntity[]
 }
 
@@ -25,7 +29,8 @@ export type EntitySelectNamedGroup = {
 }
 
 interface EntitySelectCommonProps<T>
-  extends Omit<PopoverProps, "children" | "modal">,
+  extends
+    Omit<PopoverProps, "children" | "modal">,
     Pick<
       InputFieldProps<string>,
       | "label"
@@ -84,8 +89,9 @@ export interface EntitySelectSingleProps<T> extends EntitySelectCommonProps<T> {
   singleSelector: true
 }
 
-export interface EntitySelectMultipleProps<T>
-  extends EntitySelectCommonProps<T> {
+export interface EntitySelectMultipleProps<
+  T,
+> extends EntitySelectCommonProps<T> {
   onSelect: (entities: EntitySelectEntity[]) => void
   singleSelector: false | undefined
 }

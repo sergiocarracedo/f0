@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import { withSnapshot } from "@/lib/storybook-utils/parameters"
+
 import { F0TagPerson } from "../"
 
 const meta: Meta = {
@@ -35,6 +36,14 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const DefaultPersonTag: Story = {}
+
+export const DeactivatedPersonTag: Story = {
+  args: {
+    deactivated: true,
+    name: "Saul Dominguez",
+    src: "/avatars/person05.jpg",
+  },
+}
 
 export const Snapshot: Story = {
   parameters: withSnapshot({}),

@@ -1,6 +1,7 @@
 import * as SwitchPrimitive from "@radix-ui/react-switch"
 import * as React from "react"
 import { useId } from "react"
+
 import { cn, focusRing } from "../lib/utils"
 
 const Switch = React.forwardRef<
@@ -8,8 +9,9 @@ const Switch = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof SwitchPrimitive.Root> & {
     hideLabel?: boolean
     title?: string
+    required?: boolean
   }
->(({ className, disabled, hideLabel, ...props }, ref) => {
+>(({ className, disabled, hideLabel, required, ...props }, ref) => {
   // Generate a unique ID if one isn't provided
   const uniqueId = useId()
   const switchId = props.id || uniqueId
@@ -45,6 +47,9 @@ const Switch = React.forwardRef<
           )}
         >
           {props.title}
+          {required && (
+            <span className="ml-0.5 text-f1-foreground-critical">*</span>
+          )}
         </label>
       )}
     </div>

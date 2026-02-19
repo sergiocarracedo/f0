@@ -1,8 +1,10 @@
+import { cva, type VariantProps } from "cva"
+
 import { F0Avatar, type AvatarVariant } from "@/components/avatars/F0Avatar"
 import { F0Icon, type IconType } from "@/components/F0Icon"
 import { CrossedCircle } from "@/icons/app"
+import { experimentalComponent } from "@/lib/experimental"
 import { cn, focusRing } from "@/lib/utils"
-import { cva, type VariantProps } from "cva"
 
 export const chipVariants = cva({
   base: "flex items-center gap-1 rounded-full border border-solid border-f1-border px-2 py-0.5 font-medium",
@@ -33,6 +35,8 @@ interface BaseChipProps extends VariantProps<typeof chipVariants> {
    * If defined, the close icon will be displayed and the chip will be clickable
    * */
   onClose?: () => void
+
+  deactivated?: boolean
 }
 
 type ChipVariants =
@@ -60,7 +64,8 @@ export type ChipProps = BaseChipProps &
     variant?: "default" | "selected"
   }
 
-export const Chip = ({
+const _Chip = ({
+  deactivated,
   label,
   variant,
   onClick,
@@ -90,7 +95,9 @@ export const Chip = ({
       {avatar && <F0Avatar avatar={avatar} size="xs" />}
       <div className="flex items-center gap-0.5">
         {icon && <F0Icon icon={icon} size="sm" className="text-f1-icon" />}
-        {label}
+        <span className={deactivated ? "text-f1-foreground/[0.61]" : undefined}>
+          {label}
+        </span>
       </div>
       {onClose && (
         <button
@@ -114,3 +121,8 @@ export const Chip = ({
     </div>
   )
 }
+
+/**
+ * @experimental This is an experimental component use it at your own risk
+ */
+export const Chip = experimentalComponent("Chip", _Chip)

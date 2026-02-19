@@ -1,6 +1,7 @@
 import { F0Icon, F0IconProps, IconType } from "@/components/F0Icon"
 import { AlertCircle, InfoCircle, Warning } from "@/icons/app"
 import { cn } from "@/lib/utils"
+
 import { InputFieldStatus, InputFieldStatusType } from "../types"
 
 type InputMessagesProps = {
@@ -45,18 +46,19 @@ const InputMessages = ({ status }: InputMessagesProps) => {
     messages.length > 0 && (
       <div className="flex gap-1">
         {icon && (
-          <div className="-translate-y-[2px]">
-            <F0Icon
-              icon={icon}
-              color={statuses[status.type].iconColor || "currentColor"}
-            />
-          </div>
+          <F0Icon
+            icon={icon}
+            color={statuses[status.type].iconColor || "currentColor"}
+          />
         )}
         <ul className="list-none">
           {messages.map((message) => (
             <li
               key={message}
-              className={cn("text-sm font-medium", statuses[status.type].color)}
+              className={cn(
+                "text-base font-medium",
+                statuses[status.type].color
+              )}
             >
               {message}
             </li>

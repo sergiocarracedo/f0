@@ -1,3 +1,5 @@
+import { ComponentProps } from "react"
+
 import { TableHead } from "@/experimental/OneTable"
 import {
   FiltersDefinition,
@@ -6,7 +8,7 @@ import {
   SortingKey,
   SortingsDefinition,
 } from "@/hooks/datasource"
-import { ComponentProps } from "react"
+
 import { ItemActionsDefinition } from "../../../item-actions"
 import { NavigationFiltersDefinition } from "../../../navigationFilters/types"
 import { PropertyDefinition } from "../../../property-render"
@@ -14,8 +16,8 @@ import { SummariesDefinition, SummaryKey } from "../../../summary"
 import { CollectionProps } from "../../../types"
 
 export type TableVisualizationSettings = {
-  order: ColId[]
-  hidden: ColId[]
+  order?: ColId[]
+  hidden?: ColId[]
 }
 
 export type WithOptionalSorting<

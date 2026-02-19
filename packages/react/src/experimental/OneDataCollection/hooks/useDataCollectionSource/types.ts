@@ -13,6 +13,7 @@ import {
   RecordType,
   SortingsDefinition,
 } from "@/hooks/datasource/types"
+
 import {
   PrimaryActionsDefinitionFn,
   SecondaryActionsDefinition,
@@ -67,8 +68,8 @@ export type DataCollectionPaginatedFetchOptions<
 export type DataCollectionDataAdapter<
   R extends RecordType = RecordType,
   Filters extends FiltersDefinition = FiltersDefinition,
-  NavigationFilters extends
-    NavigationFiltersDefinition = NavigationFiltersDefinition,
+  NavigationFilters extends NavigationFiltersDefinition =
+    NavigationFiltersDefinition,
 > =
   | BaseDataAdapter<
       R,
@@ -102,8 +103,8 @@ export type DataCollectionSourceDefinition<
   Sortings extends SortingsDefinition = SortingsDefinition,
   Summaries extends SummariesDefinition = SummariesDefinition,
   ItemActions extends ItemActionsDefinition<R> = ItemActionsDefinition<R>,
-  NavigationFilters extends
-    NavigationFiltersDefinition = NavigationFiltersDefinition,
+  NavigationFilters extends NavigationFiltersDefinition =
+    NavigationFiltersDefinition,
   Grouping extends GroupingDefinition<R> = GroupingDefinition<R>,
 > = Omit<
   DataSourceDefinition<R, Filters, Sortings, Grouping>,
@@ -159,8 +160,8 @@ export type DataCollectionSource<
   Sortings extends SortingsDefinition = SortingsDefinition,
   Summaries extends SummariesDefinition = SummariesDefinition,
   ItemActions extends ItemActionsDefinition<R> = ItemActionsDefinition<R>,
-  NavigationFilters extends
-    NavigationFiltersDefinition = NavigationFiltersDefinition,
+  NavigationFilters extends NavigationFiltersDefinition =
+    NavigationFiltersDefinition,
   Grouping extends GroupingDefinition<R> = GroupingDefinition<R>,
 > = DataSource<R, Filters, Sortings, Grouping> &
   DataCollectionSourceDefinition<

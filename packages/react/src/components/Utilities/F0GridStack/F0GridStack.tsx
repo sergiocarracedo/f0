@@ -5,6 +5,7 @@ import {
 } from "gridstack"
 import "gridstack/dist/gridstack.css"
 import { useMemo } from "react"
+
 import { GridStackProvider } from "./components/grid-stack-provider"
 import { GridStackRender } from "./components/grid-stack-render"
 import { GridStackRenderProvider } from "./components/grid-stack-render-provider"
@@ -13,8 +14,10 @@ export type GridStackReactOptions = Omit<GridStackOptions, "children">
 
 export type GridStackReactSize = { w: number; h: number }
 
-export interface GridStackReactWidget
-  extends Omit<GridStackWidget, "content" | "id"> {
+export interface GridStackReactWidget extends Omit<
+  GridStackWidget,
+  "content" | "id"
+> {
   id: Required<GridStackWidget>["id"]
   allowedSizes?: GridStackReactSize[]
   content?: React.ReactElement

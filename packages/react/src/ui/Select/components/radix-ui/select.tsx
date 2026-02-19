@@ -1,3 +1,5 @@
+import type { Scope } from "@radix-ui/react-context"
+
 import { clamp } from "@radix-ui/number"
 import { composeEventHandlers } from "@radix-ui/primitive"
 import { createCollection } from "@radix-ui/react-collection"
@@ -22,8 +24,6 @@ import { hideOthers } from "aria-hidden"
 import * as React from "react"
 import * as ReactDOM from "react-dom"
 import { RemoveScroll } from "react-remove-scroll"
-
-import type { Scope } from "@radix-ui/react-context"
 
 type Direction = "ltr" | "rtl"
 
@@ -568,7 +568,8 @@ type FocusScopeProps = React.ComponentPropsWithoutRef<typeof FocusScope>
 type SelectPopperPrivateProps = { onPlaced?: PopperContentProps["onPlaced"] }
 
 interface SelectContentImplProps
-  extends Omit<SelectPopperPositionProps, keyof SelectPopperPrivateProps>,
+  extends
+    Omit<SelectPopperPositionProps, keyof SelectPopperPrivateProps>,
     Omit<SelectItemAlignedPositionProps, keyof SelectPopperPrivateProps> {
   /**
    * Event handler called when auto-focusing on close.
@@ -587,9 +588,36 @@ interface SelectContentImplProps
   onPointerDownOutside?: DismissableLayerProps["onPointerDownOutside"]
 
   position?: "item-aligned" | "popper"
+
+  /**
+   * When true, disables the scroll lock that prevents scrolling outside the select.
+   * Useful for "list" mode where the select is always open.
+   */
+  disableScrollLock?: boolean
 }
 
 const Slot = createSlot("SelectContent.RemoveScroll")
+
+/**
+ * Wrapper component that conditionally renders RemoveScroll.
+ * When disableScrollLock is true, it renders children directly without scroll lock.
+ */
+const ScrollLockWrapper = ({
+  disableScrollLock,
+  children,
+}: {
+  disableScrollLock: boolean
+  children: React.ReactNode
+}) => {
+  if (disableScrollLock) {
+    return children
+  }
+  return (
+    <RemoveScroll as={Slot} allowPinchZoom>
+      {children}
+    </RemoveScroll>
+  )
+}
 
 const SelectContentImpl = React.forwardRef<
   SelectContentImplElement,
@@ -601,6 +629,7 @@ const SelectContentImpl = React.forwardRef<
     onCloseAutoFocus,
     onEscapeKeyDown,
     onPointerDownOutside,
+    disableScrollLock = false,
     //
     // PopperContent props
     side,
@@ -840,7 +869,7 @@ const SelectContentImpl = React.forwardRef<
       isPositioned={isPositioned}
       searchRef={searchRef}
     >
-      <RemoveScroll as={Slot} allowPinchZoom>
+      <ScrollLockWrapper disableScrollLock={disableScrollLock}>
         <FocusScope
           asChild
           // Disable focus trapping entirely to avoid conflicts with other
@@ -864,7 +893,7 @@ const SelectContentImpl = React.forwardRef<
         >
           <DismissableLayer
             asChild
-            disableOutsidePointerEvents
+            disableOutsidePointerEvents={!disableScrollLock}
             onEscapeKeyDown={onEscapeKeyDown}
             onPointerDownOutside={onPointerDownOutside}
             // When focus is trapped, a focusout event may still happen.
@@ -931,7 +960,7 @@ const SelectContentImpl = React.forwardRef<
             />
           </DismissableLayer>
         </FocusScope>
-      </RemoveScroll>
+      </ScrollLockWrapper>
     </SelectContentProvider>
   )
 })
@@ -946,8 +975,7 @@ const ITEM_ALIGNED_POSITION_NAME = "SelectItemAlignedPosition"
 
 type SelectItemAlignedPositionElement = React.ElementRef<typeof Primitive.div>
 interface SelectItemAlignedPositionProps
-  extends PrimitiveDivProps,
-    SelectPopperPrivateProps {}
+  extends PrimitiveDivProps, SelectPopperPrivateProps {}
 
 const SelectItemAlignedPosition = React.forwardRef<
   SelectItemAlignedPositionElement,
@@ -1036,7 +1064,12 @@ const SelectItemAlignedPosition = React.forwardRef<
         10
       )
       const contentPaddingBottom = parseInt(contentStyles.paddingBottom, 10)
-      const fullContentHeight = contentBorderTopWidth + contentPaddingTop + itemsHeight + contentPaddingBottom + contentBorderBottomWidth; // prettier-ignore
+      const fullContentHeight =
+        contentBorderTopWidth +
+        contentPaddingTop +
+        itemsHeight +
+        contentPaddingBottom +
+        contentBorderBottomWidth // prettier-ignore
       const minContentHeight = Math.min(
         selectedItem.offsetHeight * 5,
         fullContentHeight
@@ -1190,8 +1223,7 @@ type PopperContentProps = React.ComponentPropsWithoutRef<
   typeof PopperPrimitive.Content
 >
 interface SelectPopperPositionProps
-  extends PopperContentProps,
-    SelectPopperPrivateProps {}
+  extends PopperContentProps, SelectPopperPrivateProps {}
 
 const SelectPopperPosition = React.forwardRef<
   SelectPopperPositionElement,
@@ -1663,8 +1695,10 @@ const SCROLL_UP_BUTTON_NAME = "SelectScrollUpButton"
 
 type SelectScrollUpButtonElement = SelectScrollButtonImplElement
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-interface SelectScrollUpButtonProps
-  extends Omit<SelectScrollButtonImplProps, "onAutoScroll"> {}
+interface SelectScrollUpButtonProps extends Omit<
+  SelectScrollButtonImplProps,
+  "onAutoScroll"
+> {}
 
 const SelectScrollUpButton = React.forwardRef<
   SelectScrollUpButtonElement,
@@ -1721,8 +1755,10 @@ const SCROLL_DOWN_BUTTON_NAME = "SelectScrollDownButton"
 
 type SelectScrollDownButtonElement = SelectScrollButtonImplElement
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-interface SelectScrollDownButtonProps
-  extends Omit<SelectScrollButtonImplProps, "onAutoScroll"> {}
+interface SelectScrollDownButtonProps extends Omit<
+  SelectScrollButtonImplProps,
+  "onAutoScroll"
+> {}
 
 const SelectScrollDownButton = React.forwardRef<
   SelectScrollDownButtonElement,

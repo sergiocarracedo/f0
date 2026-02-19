@@ -1,3 +1,6 @@
+import { AnimatePresence, motion } from "motion/react"
+import { useCallback, useState } from "react"
+
 import { OneFilterPicker } from "@/components/OneFilterPicker"
 import { GroupingSelector } from "@/experimental/OneDataCollection/Settings/components/GroupingSelector"
 import {
@@ -8,8 +11,7 @@ import {
   RecordType,
 } from "@/hooks/datasource"
 import { useI18n } from "@/lib/providers/i18n"
-import { AnimatePresence, motion } from "motion/react"
-import { useState } from "react"
+
 import { F1SearchBox } from "../../../experimental/Forms/Fields/F1SearchBox"
 import { ActiveFiltersChips } from "./ActiveFiltersChips"
 
@@ -28,6 +30,9 @@ interface SelectTopActionsProps<
   grouping?: Grouping
   currentGrouping?: GroupingState<R, Grouping>
   onGroupingChange?: (grouping: GroupingState<R, Grouping>) => void
+  asList?: boolean
+  isFiltersOpen?: boolean
+  onFiltersOpenChange?: (open: boolean) => void
 }
 
 export const SelectTopActions = <R extends RecordType = RecordType>({
@@ -41,10 +46,21 @@ export const SelectTopActions = <R extends RecordType = RecordType>({
   filters,
   currentFilters,
   onFiltersChange,
+  asList = false,
+  onFiltersOpenChange,
 }: SelectTopActionsProps<R>) => {
   const i18n = useI18n()
 
-  const [isFiltersOpen, setIsFiltersOpen] = useState(false)
+  const [isFiltersOpenLocal, setIsFiltersOpenLocal] = useState(false)
+
+  // Stable callback that updates both local and parent state
+  const handleFiltersOpenChange = useCallback(
+    (open: boolean) => {
+      setIsFiltersOpenLocal(open)
+      onFiltersOpenChange?.(open)
+    },
+    [onFiltersOpenChange]
+  )
 
   if (
     !showSearchBox &&
@@ -66,7 +82,7 @@ export const SelectTopActions = <R extends RecordType = RecordType>({
                 onChange={onSearchChange}
                 value={searchValue}
                 debounceTime={400}
-                autoFocus={!isFiltersOpen}
+                autoFocus={!asList && !isFiltersOpenLocal}
                 clearable
               />
             </div>
@@ -76,8 +92,8 @@ export const SelectTopActions = <R extends RecordType = RecordType>({
               filters={filters}
               value={currentFilters}
               onChange={onFiltersChange}
-              mode="compact"
-              onOpenChange={setIsFiltersOpen}
+              mode={asList ? "simple" : "compact"}
+              onOpenChange={handleFiltersOpenChange}
             />
           )}
         </div>

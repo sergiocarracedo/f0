@@ -1,7 +1,3 @@
-import { Spinner } from "@/experimental/Information/Spinner"
-import { useReducedMotion } from "@/lib/a11y"
-import { cn } from "@/lib/utils"
-import { ScrollArea } from "@/ui/scrollarea"
 import { useVirtualizer } from "@tanstack/react-virtual"
 import {
   ComponentPropsWithoutRef,
@@ -14,6 +10,12 @@ import {
   useRef,
   useState,
 } from "react"
+
+import { Spinner } from "@/ui/Spinner"
+import { useReducedMotion } from "@/lib/a11y"
+import { cn } from "@/lib/utils"
+import { ScrollArea } from "@/ui/scrollarea"
+
 import { VirtualItem } from "../index"
 import { SelectContext } from "../SelectContext"
 import * as SelectPrimitive from "./radix-ui"
@@ -149,7 +151,10 @@ const SelectContent = forwardRef<
 
     useEffect(() => {
       // Measure the items when the animation is finished
-      virtualizer.measure()
+      // Skip measurement when asList is true to prevent layout shifts from tooltips
+      if (!asList) {
+        virtualizer.measure()
+      }
     }, [virtualizer, animationStarted, asList])
 
     useEffect(() => {
@@ -168,7 +173,7 @@ const SelectContent = forwardRef<
         className={cn(
           !asList && "transition-opacity delay-100",
           asList || virtualReady ? "" : "opacity-0",
-          !asList && forceMinHeight ? "min-h-[450px]" : ""
+          !asList && forceMinHeight ? "min-h-[412px]" : ""
         )}
         style={{
           height: virtualizer.getTotalSize() + VIEWBOX_VERTICAL_PADDING,
@@ -211,9 +216,13 @@ const SelectContent = forwardRef<
     const content = (
       <SelectPrimitive.Content
         ref={ref}
-        asChild={asChild || asSelectProp === "list"}
+        asChild={asChild}
+        disableScrollLock={asList}
         className={cn(
-          "relative z-50 min-w-[8rem] overflow-hidden text-f1-foreground",
+          "relative z-50 text-f1-foreground",
+          asList
+            ? "flex w-full h-full flex-col"
+            : "flex min-w-[8rem] flex-col overflow-hidden",
           !asList &&
             "rounded-md border border-solid border-f1-border-secondary bg-f1-background shadow-md data-[state=closed]:fade-out-0 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 motion-safe:data-[state=open]:animate-in motion-safe:data-[state=closed]:animate-out motion-safe:data-[state=open]:fade-in-0 motion-safe:data-[state=closed]:zoom-out-95 motion-safe:data-[state=open]:zoom-in-95 motion-safe:data-[side=bottom]:slide-in-from-top-2",
           !asList &&
@@ -221,10 +230,19 @@ const SelectContent = forwardRef<
             "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
           !asList &&
             position === "popper" &&
-            "min-w-[var(--radix-select-trigger-width)] max-w-[min(calc(var(--radix-select-trigger-width)*2.5),450px)]",
-          className,
+            "min-w-[var(--radix-select-trigger-width)] max-w-[min(calc(var(--radix-select-trigger-width)*2.5),412px)]",
+          // Max-height for the entire select content (including filters overlay)
+          !asList &&
+            (taller
+              ? "max-h-[min(412px,calc(var(--radix-select-content-available-height,412px)))]"
+              : "max-h-[min(320px,calc(var(--radix-select-content-available-height,320px)))]"),
+          // Apply min-height when filters are present to maintain consistent size
+          !asList &&
+            forceMinHeight &&
+            "min-h-[min(412px,calc(var(--radix-select-content-available-height,412px)-110px))]",
           // Hides the content when the virtual list is not ready
-          !asList && isVirtual && !virtualReady && "opacity-0"
+          !asList && isVirtual && !virtualReady && "opacity-0",
+          className
         )}
         position={asList ? "item-aligned" : position}
         collisionPadding={16}
@@ -254,8 +272,14 @@ const SelectContent = forwardRef<
         }}
       >
         <>
-          {props.top}
-          <div className="relative">
+          {asList && <div className="flex-shrink-0">{props.top}</div>}
+          <div
+            className={cn(
+              "relative flex flex-1 min-h-0 flex-col overflow-hidden",
+              asList && "flex flex-col overflow-hidden flex-1 min-h-0"
+            )}
+          >
+            {!asList && props.top}
             {showLoadingIndicator && loadingNewContent && (
               <div
                 className="absolute inset-0 flex cursor-progress items-center justify-center"
@@ -268,17 +292,7 @@ const SelectContent = forwardRef<
             <ScrollArea
               viewportRef={parentRef}
               className={cn(
-                "flex flex-col overflow-y-auto",
-                // Dynamic max-height: min of desired height and available viewport space minus top/bottom content
-                asList
-                  ? "max-h-full"
-                  : taller
-                    ? "max-h-[min(460px,calc(var(--radix-select-content-available-height,460px)-110px))]"
-                    : "max-h-[min(320px,calc(var(--radix-select-content-available-height,320px)))]",
-                // Apply min-height when filters are present to maintain consistent size
-                !asList &&
-                  forceMinHeight &&
-                  "min-h-[min(450px,calc(var(--radix-select-content-available-height,450px)-110px))]",
+                "flex h-full flex-col",
                 // Center content vertically when empty
                 isEmpty && "justify-center",
                 loadingNewContent && "select-none opacity-10 transition-opacity"
@@ -288,14 +302,13 @@ const SelectContent = forwardRef<
               scrollMargin={scrollMargin}
             >
               {asList ? (
-                viewportContent
+                <div className="min-h-0 p-1">{viewportContent}</div>
               ) : (
                 <SelectPrimitive.Viewport
                   asChild
                   className={cn(
                     "p-1",
-                    !asList &&
-                      position === "popper" &&
+                    position === "popper" &&
                       "h-[var(--radix-select-trigger-height)] w-full",
                     isEmpty && "flex h-full"
                   )}
@@ -315,7 +328,7 @@ const SelectContent = forwardRef<
     ) : (
       <SelectPrimitive.Portal container={portalContainer}>
         <>
-          {/* 
+          {/*
             Overlay to prevent clicks from propagating.
             Only render when NOT using a custom portal container to avoid
             conflicts with modal focus management.

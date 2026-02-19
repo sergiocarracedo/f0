@@ -1,9 +1,11 @@
 "use client"
 
+import { useMemo, useState } from "react"
+
 import { InputInternal } from "@/experimental/Forms/Fields/Input/internal"
 import { Equal, EqualApproximately } from "@/icons/app"
 import { useI18n } from "@/lib/providers/i18n"
-import { useMemo, useState } from "react"
+
 import { FilterTypeComponentProps } from "../types"
 
 export type SearchFilterOptions =
@@ -88,7 +90,7 @@ export function SearchFilter({
   }, [value])
 
   return (
-    <div className="space-y-4 p-3">
+    <div className="space-y-4 p-2">
       <InputInternal
         label={`Search ${schema.label.toLowerCase()}...`}
         hideLabel

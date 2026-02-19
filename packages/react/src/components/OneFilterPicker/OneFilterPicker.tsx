@@ -1,14 +1,16 @@
 import { useContext, useEffect, useMemo, useRef, useState } from "react"
+
+import { useEventEmitter } from "@/experimental/OneDataCollection/useEventEmitter"
+import { cn } from "@/lib/utils"
+
+import type { FiltersDefinition, FiltersMode, FiltersState } from "./types"
+
 import { FiltersChipsList as FiltersChipsListComponent } from "./components/FiltersChipsList"
 import { FiltersControls as FiltersControlsComponent } from "./components/FiltersControls"
 import { FiltersPresets as FiltersPresetsComponent } from "./components/FiltersPresets"
 import { FiltersContext } from "./context"
 import { getPresetCoveredKeys } from "./internal/getPresetCoveredKeys"
 import { PresetsDefinition } from "./types"
-
-import { useEventEmitter } from "@/experimental/OneDataCollection/useEventEmitter"
-import { cn } from "@/lib/utils"
-import type { FiltersDefinition, FiltersMode, FiltersState } from "./types"
 
 /**
  * Props for the Filters component.
@@ -31,6 +33,8 @@ export type OneFilterPickerRootProps<Definition extends FiltersDefinition> = {
   mode?: FiltersMode
   /** Callback fired when filters open state is changed */
   onOpenChange?: (isOpen: boolean) => void
+  /** Display counter for the applied filters */
+  displayCounter?: boolean
 }
 
 /**
@@ -170,6 +174,7 @@ const FiltersControls = () => {
     presets,
     emitFilterChange,
     mode,
+    displayCounter,
   } = useContext(FiltersContext)
 
   const shownFilters = filters
@@ -193,8 +198,9 @@ const FiltersControls = () => {
         onChange={handleFilterChange}
         onOpenChange={setIsFiltersOpen}
         isOpen={isFiltersOpen}
-        hideLabel={!!presets}
+        hideLabel={!!presets || mode === "simple"}
         mode={mode}
+        displayCounter={displayCounter}
       />
       {!!presets?.length && (
         <div className="flex items-center">

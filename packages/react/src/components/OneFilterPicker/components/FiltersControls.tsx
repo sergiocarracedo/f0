@@ -1,15 +1,21 @@
+import { useControllableState } from "@radix-ui/react-use-controllable-state"
+import { AnimatePresence, motion } from "motion/react"
+import { useContext, useEffect, useId, useMemo, useRef, useState } from "react"
+
 import { F0Button } from "@/components/F0Button"
 import { ButtonInternal } from "@/components/F0Button/internal"
+import { F0DialogContext } from "@/components/F0Dialog"
+import { FilterPickerInternal } from "@/components/F0FilterPickerContent/internal"
 import { Filter } from "@/icons/app"
 import { useI18n } from "@/lib/providers/i18n"
 import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover"
-import { AnimatePresence, motion } from "motion/react"
-import { useEffect, useId, useMemo, useState } from "react"
+
+import type { FiltersDefinition, FiltersMode, FiltersState } from "../types"
+
 import { ArrowLeft } from "../../../icons/app"
 import { getFilterType } from "../filterTypes"
 import { FilterTypeContext, FilterTypeSchema } from "../filterTypes/types"
 import { getActiveFilterKeys } from "../internal/getActiveFilterKeys"
-import type { FiltersDefinition, FiltersMode, FiltersState } from "../types"
 import { FilterContent } from "./FilterContent"
 import { FilterList } from "./FilterList"
 
@@ -21,6 +27,7 @@ interface FiltersControlsProps<Filters extends FiltersDefinition> {
   onOpenChange?: (open: boolean) => void
   hideLabel?: boolean
   mode?: FiltersMode
+  displayCounter?: boolean
 }
 
 const DEFAULT_FORM_HEIGHT = 388
@@ -33,15 +40,57 @@ export function FiltersControls<Filters extends FiltersDefinition>({
   onOpenChange: controlledOnOpenChange,
   hideLabel,
   mode = "default",
+  displayCounter = false,
 }: FiltersControlsProps<Filters>) {
   const [selectedFilterKey, setSelectedFilterKey] = useState<
     keyof Filters | null
   >(null)
-  const [internalIsOpen, setInternalIsOpen] = useState(false)
   const i18n = useI18n()
 
-  const isOpen = controlledIsOpen ?? internalIsOpen
-  const onOpenChange = controlledOnOpenChange ?? setInternalIsOpen
+  // Auto-detect if we're inside a dialog and use its portal container
+  const dialogContext = useContext(F0DialogContext)
+  const shouldUseDialogContainer =
+    dialogContext.portalContainer &&
+    (dialogContext.position === "center" ||
+      dialogContext.position === "fullscreen")
+  const portalContainer = shouldUseDialogContainer
+    ? dialogContext.portalContainer
+    : undefined
+
+  const [isOpen, setIsOpen] = useControllableState({
+    prop: controlledIsOpen,
+    defaultProp: false,
+    onChange: controlledOnOpenChange,
+  })
+
+  const isOpenRef = useRef(isOpen)
+  useEffect(() => {
+    isOpenRef.current = isOpen
+  }, [isOpen])
+
+  const isClosingRef = useRef(false)
+  const handleOpenChange = (open: boolean) => {
+    const currentIsOpen = isOpenRef.current
+
+    if (isClosingRef.current) {
+      return
+    }
+
+    if (currentIsOpen) {
+      isClosingRef.current = true
+      setIsOpen(false)
+
+      setTimeout(() => {
+        isClosingRef.current = false
+      }, 150)
+
+      return
+    }
+
+    setIsOpen(open)
+  }
+
+  const onOpenChange = handleOpenChange
 
   const [localFiltersValue, setLocalFiltersValue] = useState(value)
   useEffect(() => {
@@ -116,6 +165,12 @@ export function FiltersControls<Filters extends FiltersDefinition>({
     [filters, localFiltersValue, i18n]
   )
 
+  const appliedFiltersCount = useMemo(() => {
+    const count = getActiveFilterKeys(filters, value, i18n).length
+    if (count === 0) return undefined
+    return count
+  }, [filters, value, i18n])
+
   const activeFiltersTooltip = useMemo(() => {
     return activeFilters.length > 0
       ? i18n.t("filters.activeFilters", {
@@ -129,6 +184,7 @@ export function FiltersControls<Filters extends FiltersDefinition>({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- We only want to run this when the active filters change
   }, [activeFilters, filters])
 
+  // Compact mode has its own UI with animations
   if (mode === "compact") {
     const hasFiltersApplied = !!Object.values(localFiltersValue).length
 
@@ -155,7 +211,7 @@ export function FiltersControls<Filters extends FiltersDefinition>({
     const ApplySelectionButton = (
       <>
         {selectedFilterKey && (
-          <div className="absolute bottom-0 left-0 right-0 z-30 flex items-center justify-end gap-2 border border-solid border-transparent border-t-f1-border-secondary bg-f1-background p-2">
+          <div className="sticky bottom-0 left-0 right-0 z-30 flex items-center justify-end gap-2 border border-solid border-transparent border-t-f1-border-secondary p-2 bg-f1-background">
             <F0Button
               onClick={handleApplyFiltersSelection}
               label={i18n.filters.applySelection}
@@ -192,9 +248,9 @@ export function FiltersControls<Filters extends FiltersDefinition>({
               transition={{ duration: 0.1 }}
               className="absolute bottom-0 left-0 right-0 top-0 z-20 bg-f1-background"
             >
-              <div className="flex h-full flex-col transition-all">
+              <div className="flex h-full flex-col transition-all flex-1 min-h-0 max-h-full">
                 {NavHeader}
-                <div className="flex flex-1">
+                <div className="flex flex-1 min-h-0 max-h-full">
                   {selectedFilterKey ? (
                     <motion.div
                       key="filter-content"
@@ -243,58 +299,37 @@ export function FiltersControls<Filters extends FiltersDefinition>({
     )
   }
 
+  // Default mode uses FilterPickerInner for the content
   return (
     <div className="flex items-center gap-2">
-      <Popover open={isOpen} onOpenChange={onOpenChange}>
+      <Popover open={isOpen} onOpenChange={onOpenChange} modal>
         <PopoverTrigger asChild>
           <ButtonInternal
             variant="outline"
             label={i18n.filters.label}
             icon={Filter}
             pressed={isOpen}
-            onClick={() => onOpenChange(!isOpen)}
             hideLabel={hideLabel}
             aria-controls={isOpen ? id : undefined}
+            counterValue={displayCounter ? appliedFiltersCount : undefined}
           />
         </PopoverTrigger>
         <PopoverContent
-          className="w-[600px] rounded-xl border border-solid border-f1-border-secondary p-0 shadow-md"
+          className="w-fit min-w-[600px] rounded-xl border border-solid border-f1-border-secondary p-0 shadow-md"
           align="start"
           side="bottom"
           aria-id={id}
+          container={portalContainer}
         >
-          <div
-            className="flex flex-col transition-all"
-            style={{
-              height: formHeight || DEFAULT_FORM_HEIGHT,
-            }}
-          >
-            <div className="flex min-h-0 flex-1">
-              <FilterList
-                definition={filters}
-                tempFilters={localFiltersValue}
-                selectedFilterKey={selectedFilterKey}
-                onFilterSelect={(key: keyof Filters) =>
-                  setSelectedFilterKey(key)
-                }
-                onClickApplyFilters={handleApplyFilters}
-              />
-              {selectedFilterKey && (
-                <FilterContent
-                  selectedFilterKey={selectedFilterKey}
-                  definition={filters}
-                  tempFilters={localFiltersValue}
-                  onFilterChange={updateFilterValue}
-                />
-              )}
-            </div>
-            <div className="flex items-center justify-end gap-2 border border-solid border-transparent border-t-f1-border-secondary bg-f1-background p-2">
-              <F0Button
-                onClick={handleApplyFilters}
-                label={i18n.filters.applyFilters}
-              />
-            </div>
-          </div>
+          <FilterPickerInternal
+            filters={filters}
+            tempFilters={localFiltersValue}
+            selectedFilterKey={selectedFilterKey}
+            onFilterSelect={setSelectedFilterKey}
+            onFilterChange={updateFilterValue}
+            onApply={handleApplyFilters}
+            height={formHeight || DEFAULT_FORM_HEIGHT}
+          />
         </PopoverContent>
       </Popover>
     </div>

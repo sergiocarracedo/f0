@@ -1,13 +1,15 @@
+import { ChevronDown, ChevronRight } from "lucide-react"
+import { useState } from "react"
+
 import { F0AvatarPerson } from "@/components/avatars/F0AvatarPerson"
 import { F0Button } from "@/components/F0Button"
 import { F0Icon } from "@/components/F0Icon"
-import { Counter } from "@/experimental/Information/Counter"
+import { Counter } from "@/ui/Counter"
 import { CheckCircle } from "@/icons/app"
 import LogoAvatar from "@/icons/app/LogoAvatar"
 import { cn } from "@/lib/utils"
 import { Checkbox } from "@/ui/checkbox"
-import { ChevronDown, ChevronRight } from "lucide-react"
-import { useState } from "react"
+
 import { HighlightText } from "../HighLightText"
 import { EntitySelectEntity } from "../types"
 
@@ -122,11 +124,17 @@ export const ListItemSingleContent = ({
             firstName={firstName}
             lastName={lastName}
             size="xs"
+            deactivated={entity.deactivated}
           />
         )}
 
         <div className="flex flex-1 flex-col">
-          <div className="flex flex-1 flex-row items-center gap-2 break-all">
+          <div
+            className={cn(
+              "flex flex-1 flex-row items-center gap-2 break-all",
+              entity.deactivated ? "text-f1-foreground/[0.61]" : undefined
+            )}
+          >
             <HighlightText
               text={entity.name}
               search={search}

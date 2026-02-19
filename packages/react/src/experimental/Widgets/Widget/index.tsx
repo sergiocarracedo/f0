@@ -1,11 +1,15 @@
+import { cva, type VariantProps } from "cva"
+import React, { forwardRef, ReactNode, useEffect } from "react"
+
 import { F0Button, type F0ButtonProps } from "@/components/F0Button"
 import { F0Icon, IconType } from "@/components/F0Icon"
 import { F0TagAlert } from "@/components/tags/F0TagAlert"
 import { F0TagStatus, StatusVariant } from "@/components/tags/F0TagStatus"
-import { Counter } from "@/experimental/Information/Counter"
+import { Counter } from "@/ui/Counter"
 import { Tooltip } from "@/experimental/Overlays/Tooltip"
-import { PrivateBox } from "@/experimental/Utilities/PrivateBox"
+import { PrivateBox } from "@/sds/Profile/PrivateBox"
 import { EyeInvisible, EyeVisible, InfoCircleLine } from "@/icons/app"
+import { experimentalComponent } from "@/lib/experimental"
 import { usePrivacyMode } from "@/lib/privacyMode"
 import { withSkeleton } from "@/lib/skeleton"
 import { cn } from "@/lib/utils"
@@ -21,8 +25,6 @@ import {
 } from "@/ui/Card"
 import { Separator } from "@/ui/separator"
 import { Skeleton as SkeletonPrimitive } from "@/ui/skeleton"
-import { cva, type VariantProps } from "cva"
-import React, { forwardRef, ReactNode, useEffect } from "react"
 
 export interface WidgetProps {
   header?: {
@@ -97,9 +99,6 @@ const Container = forwardRef<
         fullHeight ? "h-full" : "",
         "relative flex gap-3 border-f1-border-secondary"
       )}
-      style={{
-        backgroundColor: "hsl(var(--white-40))",
-      }}
       ref={ref}
     >
       {header && (
@@ -278,4 +277,10 @@ const Skeleton = forwardRef<HTMLDivElement, WidgetSkeletonProps>(
   }
 )
 
-export const Widget = withSkeleton(Container, Skeleton)
+/**
+ * @experimental This is an experimental component use it at your own risk
+ */
+export const Widget = experimentalComponent(
+  "Widget",
+  withSkeleton(Container, Skeleton)
+)

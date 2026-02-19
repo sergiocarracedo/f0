@@ -2,9 +2,15 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import { ComponentProps } from "react"
 import { fn } from "storybook/test"
+
 import { famousEmployees } from "../entity-select-name.factory"
 import { mapEntitySelectEntityToSubentity } from "../utils"
 import { ListTag } from "./index"
+
+const defaultArgs = {
+  entity: mapEntitySelectEntityToSubentity(famousEmployees[0]),
+  onRemove: fn(),
+}
 
 const meta: Meta = {
   component: ListTag,
@@ -21,8 +27,7 @@ const meta: Meta = {
     ),
   ],
   args: {
-    entity: mapEntitySelectEntityToSubentity(famousEmployees[0]),
-    onRemove: fn(),
+    ...defaultArgs,
   } satisfies ComponentProps<typeof ListTag>,
 } satisfies Meta<typeof ListTag>
 
@@ -30,3 +35,10 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
+
+export const WithDeactivatedTag: Story = {
+  args: {
+    ...defaultArgs,
+    deactivated: true,
+  },
+}

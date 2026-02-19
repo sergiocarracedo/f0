@@ -1,7 +1,9 @@
-import { F0Button, type F0ButtonProps } from "@/components/F0Button"
 import type { IconType } from "@/components/F0Icon"
+
+import { F0Button, type F0ButtonProps } from "@/components/F0Button"
 import { F0Link } from "@/components/F0Link"
 import { useLayout } from "@/layouts/LayoutProvider"
+import { experimentalComponent } from "@/lib/experimental"
 import { cn } from "@/lib/utils"
 
 type Props = {
@@ -27,7 +29,7 @@ type Props = {
   separator?: "top" | "bottom"
 }
 
-export const SectionHeader = ({
+const _SectionHeader = ({
   title,
   description,
   action,
@@ -39,7 +41,7 @@ export const SectionHeader = ({
     <div
       className={cn(
         "border-1 flex flex-col justify-between gap-4 border-dashed border-transparent px-6 pb-5 pt-5 first:pb-0 first:pt-0 md:flex-row md:gap-2",
-        layout === "standard" && "-mx-6",
+        layout === "standard" && "-mx-[23px]",
         separator === "top" && "border-t-f1-border first:pt-5",
         separator === "bottom" && "border-b-f1-border first:pb-5"
       )}
@@ -82,3 +84,11 @@ export const SectionHeader = ({
     </div>
   )
 }
+
+/**
+ * @experimental This is an experimental component use it at your own risk
+ */
+export const SectionHeader = experimentalComponent(
+  "SectionHeader",
+  _SectionHeader
+)

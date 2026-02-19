@@ -1,8 +1,9 @@
+import { useState } from "react"
+
 import { ButtonInternal } from "@/components/F0Button/internal"
 import { Dropdown, DropdownItem } from "@/experimental/Navigation/Dropdown"
 import { Ellipsis } from "@/icons/app"
 import { cn } from "@/lib/utils"
-import { useState } from "react"
 
 export type ItemActionsDropdownProps = {
   items: DropdownItem[]
@@ -30,7 +31,7 @@ export const ItemActionsDropdown = ({
       <Dropdown
         align={align}
         items={items.map((item) => {
-          if (item.type === "separator") {
+          if (item.type === "separator" || item.type === "label") {
             return item
           }
           return {

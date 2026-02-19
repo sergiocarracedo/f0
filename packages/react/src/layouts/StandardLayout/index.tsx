@@ -1,10 +1,13 @@
-import { cn } from "@/lib/utils"
 import { cva, type VariantProps } from "cva"
 import React from "react"
+
+import { cn } from "@/lib/utils"
+
 import { LayoutProvider } from "../LayoutProvider"
 
-export interface StandardLayoutProps
-  extends VariantProps<typeof layoutVariants> {
+export interface StandardLayoutProps extends VariantProps<
+  typeof layoutVariants
+> {
   children?: React.ReactNode
 }
 

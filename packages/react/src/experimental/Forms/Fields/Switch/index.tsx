@@ -1,4 +1,5 @@
 import { DataAttributes } from "@/global.types"
+import { experimentalComponent } from "@/lib/experimental"
 import { Switch as SwitchRoot } from "@/ui/switch"
 
 interface SwitchProps extends DataAttributes {
@@ -45,9 +46,15 @@ interface SwitchProps extends DataAttributes {
    * @default false
    */
   presentational?: boolean
+
+  /**
+   * Whether the switch is required (must be true)
+   * @default false
+   */
+  required?: boolean
 }
 
-export function Switch({
+function _Switch({
   title,
   onCheckedChange,
   id,
@@ -56,6 +63,7 @@ export function Switch({
   value,
   hideLabel = false,
   presentational = false,
+  required = false,
   ...rest
 }: SwitchProps) {
   return (
@@ -67,8 +75,14 @@ export function Switch({
       checked={checked}
       value={value}
       hideLabel={hideLabel}
+      required={required}
       tabIndex={presentational ? -1 : undefined}
       {...rest}
     />
   )
 }
+
+/**
+ * @experimental This is an experimental component use it at your own risk
+ */
+export const Switch = experimentalComponent("Switch", _Switch)

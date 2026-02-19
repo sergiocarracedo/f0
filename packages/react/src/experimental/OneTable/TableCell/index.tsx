@@ -1,17 +1,18 @@
+import { AnimatePresence, motion } from "motion/react"
+import { useRef } from "react"
+
 import { NestedRowProps } from "@/experimental/OneDataCollection/visualizations/collection/Table/components/Row"
 import { Skeleton } from "@/ui/skeleton"
 import { TableCell as TableCellRoot } from "@/ui/table"
-import { AnimatePresence, motion } from "motion/react"
-import { useRef } from "react"
+
 import { Link } from "../../../lib/linkHandler"
 import { useI18n } from "../../../lib/providers/i18n"
 import { cn } from "../../../lib/utils"
-import { useTable } from "../utils/TableContext"
 import { getColWidth } from "../utils/colWidth"
+import { useTable } from "../utils/TableContext"
 import { NestedCell } from "./NestedCell"
 import { TreeConnector } from "./TreeConnector"
 import {
-  emptyDetailedCellClassName,
   isFirstCellWithChildren,
   isFirstCellWithTableChildren,
   SPACING_FACTOR,
@@ -182,7 +183,6 @@ export function TableCell({
               <div
                 className={cn(
                   width !== "auto" && "overflow-hidden",
-                  emptyDetailedCellClassName(nestedRowProps),
                   "relative z-[1]"
                 )}
                 style={{

@@ -1,9 +1,10 @@
+import { useMediaQuery } from "usehooks-ts"
+
 import { F0Button } from "@/components/F0Button"
 import { IconType } from "@/components/F0Icon"
 import { F0Link, type F0LinkProps } from "@/components/F0Link"
 import { cn } from "@/lib/utils"
 import { CardFooter } from "@/ui/Card"
-import { useMediaQuery } from "usehooks-ts"
 
 export interface CardPrimaryAction {
   label: string
@@ -17,8 +18,10 @@ export interface CardSecondaryAction {
   onClick: () => void
 }
 
-export interface CardSecondaryLink
-  extends Pick<F0LinkProps, "href" | "target" | "disabled"> {
+export interface CardSecondaryLink extends Pick<
+  F0LinkProps,
+  "href" | "target" | "disabled"
+> {
   label: string
 }
 
@@ -57,7 +60,10 @@ export function CardActions({
                 label={action.label}
                 icon={action.icon}
                 variant="outline"
-                onClick={action.onClick}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  action.onClick()
+                }}
                 hideLabel={isDesktop && index > 0}
                 size={isDesktop ? (compact ? "sm" : "md") : "lg"}
               />
@@ -67,6 +73,7 @@ export function CardActions({
               href={secondaryActions.href}
               target={secondaryActions.target}
               disabled={secondaryActions.disabled}
+              onClick={(e) => e.stopPropagation()}
               data-testid="secondary-link"
             >
               {secondaryActions.label}
@@ -80,7 +87,10 @@ export function CardActions({
           <F0Button
             label={primaryAction.label}
             icon={primaryAction.icon}
-            onClick={primaryAction.onClick}
+            onClick={(e) => {
+              e.stopPropagation()
+              primaryAction.onClick()
+            }}
             size={isDesktop ? (compact ? "sm" : "md") : "lg"}
             data-testid="primary-button"
           />

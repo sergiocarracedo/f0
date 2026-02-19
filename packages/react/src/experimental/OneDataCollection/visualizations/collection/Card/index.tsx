@@ -1,4 +1,11 @@
-import { F0Card } from "@/components/F0Card"
+import { AnimatePresence, motion } from "motion/react"
+import { useEffect, useMemo } from "react"
+
+import {
+  F0Card,
+  type CardImageFit,
+  type CardImageSize,
+} from "@/components/F0Card"
 import { CardAvatarVariant } from "@/components/F0Card/components/CardAvatar"
 import { cardPropertyRenderers } from "@/components/F0Card/components/CardMetadata"
 import { CardMetadata, CardMetadataProperty } from "@/components/F0Card/types"
@@ -15,9 +22,9 @@ import { cn } from "@/lib/utils"
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/Card"
 import { GroupHeader } from "@/ui/GroupHeader/GroupHeader"
 import { Skeleton } from "@/ui/skeleton"
-import { AnimatePresence, motion } from "motion/react"
-import { useEffect, useMemo } from "react"
+
 import type { FiltersDefinition } from "../../../../../components/OneFilterPicker/types"
+
 import { PagesPagination } from "../../../components/PagesPagination"
 import { ItemActionsDefinition } from "../../../item-actions"
 import { PropertyDefinition } from "../../../property-render"
@@ -39,6 +46,9 @@ export type CardVisualizationOptions<
   description?: (record: T) => string
   avatar?: (record: T) => CardAvatarVariant
   image?: (record: T) => string
+  imageFit?: CardImageFit
+  imageSize?: CardImageSize
+  blurredBackground?: boolean
   compact?: boolean
 }
 
@@ -121,6 +131,9 @@ type GroupCardsProps<
   description?: (record: Record) => string
   avatar?: (record: Record) => CardAvatarVariant
   image?: (record: Record) => string
+  imageFit?: CardImageFit
+  imageSize?: CardImageSize
+  blurredBackground?: boolean
   compact?: boolean
   tmpFullWidth?: boolean
 }
@@ -143,6 +156,9 @@ const GroupCards = <
   description,
   avatar,
   image,
+  imageFit,
+  imageSize,
+  blurredBackground,
   compact,
   tmpFullWidth,
 }: GroupCardsProps<
@@ -266,6 +282,9 @@ const GroupCards = <
               description={description ? description(item) : undefined}
               avatar={avatar ? avatar(item) : undefined}
               image={image ? image(item) : undefined}
+              imageFit={imageFit}
+              imageSize={imageSize}
+              blurredBackground={blurredBackground}
               selected={selectable && selectedItems.has(id)}
               onSelect={(selected) => handleSelectItemChange(item, selected)}
               secondaryActions={secondaryActions}
@@ -298,6 +317,9 @@ export const CardCollection = <
   description,
   avatar,
   image,
+  imageFit,
+  imageSize,
+  blurredBackground,
   compact,
   source,
   onSelectItems,
@@ -448,6 +470,9 @@ export const CardCollection = <
                           description={description}
                           avatar={avatar}
                           image={image}
+                          imageFit={imageFit}
+                          imageSize={imageSize}
+                          blurredBackground={blurredBackground}
                           compact={compact}
                           tmpFullWidth={tmpFullWidth}
                         />
@@ -468,6 +493,9 @@ export const CardCollection = <
                 description={description}
                 avatar={avatar}
                 image={image}
+                imageFit={imageFit}
+                imageSize={imageSize}
+                blurredBackground={blurredBackground}
                 compact={compact}
                 tmpFullWidth={tmpFullWidth}
               />

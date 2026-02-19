@@ -1,7 +1,9 @@
-import { screen, zeroRender } from "@/testing/test-utils"
-import "@testing-library/jest-dom/vitest"
 import React from "react"
+import "@testing-library/jest-dom/vitest"
 import { beforeEach, describe, expect, it, vi } from "vitest"
+
+import { screen, zeroRender } from "@/testing/test-utils"
+
 import { Dashboard } from "../Dashboard"
 import { DashboardWidget } from "../typings"
 const _ = React
@@ -52,9 +54,8 @@ describe("Dashboard", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks()
-    const module = await import(
-      "../../../components/Utilities/F0GridStack/F0GridStack"
-    )
+    const module =
+      await import("../../../components/Utilities/F0GridStack/F0GridStack")
     mockF0GridStack = vi.mocked(module.F0GridStack)
   })
 

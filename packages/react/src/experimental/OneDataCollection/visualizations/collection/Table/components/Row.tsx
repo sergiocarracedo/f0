@@ -19,6 +19,7 @@ import { NestedVariant } from "@/hooks/datasource/types/nested.typings"
 import { useI18n } from "@/lib/providers/i18n"
 import { cn } from "@/lib/utils"
 import { Checkbox } from "@/ui/checkbox"
+
 import { ItemActionsRow } from "../../../../components/itemActions/ItemActionsRow/ItemActionsRow"
 import { TableColumnDefinition } from "../types"
 import { useSticky } from "../useSticky"
@@ -54,6 +55,7 @@ export type RowProps<
   loading?: boolean
   tableWithChildren: boolean
   nestedRowProps?: NestedRowProps
+  disableHover?: boolean
 }
 
 export type NestedRowProps = {
@@ -61,6 +63,7 @@ export type NestedRowProps = {
   depth?: number
   expanded?: boolean
   hasLoadedChildren?: boolean
+  isLastChild?: boolean
   nestedVariant?: NestedVariant
   parentHasChildren?: boolean
   onExpand?: () => void
@@ -90,6 +93,7 @@ const RowComponentInner = <
     loading = false,
     nestedRowProps,
     tableWithChildren,
+    disableHover = false,
   }: RowProps<
     R,
     Filters,
@@ -124,6 +128,7 @@ const RowComponentInner = <
   )
 
   const {
+    hasItemActions,
     primaryItemActions,
     dropdownItemActions,
     mobileDropdownItemActions,
@@ -162,7 +167,7 @@ const RowComponentInner = <
         "group transition-colors hover:bg-f1-background-hover",
         "after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-px after:w-full after:bg-f1-border-secondary after:content-['']",
         noBorder && "after:bg-white-100",
-        !!nestedRowProps?.onLoadMoreChildren && "hover:bg-transparent"
+        disableHover && "hover:bg-transparent"
       )}
     >
       {source.selectable && (
@@ -210,38 +215,36 @@ const RowComponentInner = <
         </TableCell>
       ))}
 
-      {source.itemActions &&
-        !loading &&
-        !nestedRowProps?.onLoadMoreChildren && (
-          <>
-            {/** Desktop item actions adds a sticky column to the table to not overflow when the table is scrolled horizontally*/}
-            <td className="sticky right-0 top-0 z-10 hidden md:table-cell">
-              <ItemActionsRowContainer dropDownOpen={dropDownOpen}>
-                <ItemActionsRow
-                  primaryItemActions={primaryItemActions}
-                  dropdownItemActions={dropdownItemActions}
-                  handleDropDownOpenChange={handleDropDownOpenChange}
-                />
-              </ItemActionsRowContainer>
-            </td>
-            {/** Mobile item actions */}
-            <TableCell
-              key={`table-cell-${groupIndex}-${index}-actions`}
-              width={68}
-              sticky={{
-                right: 0,
-              }}
-              href={itemHref}
-              className="table-cell md:hidden"
-              loading={loading}
-            >
-              <ItemActionsMobile
-                items={mobileDropdownItemActions}
-                onOpenChange={handleDropDownOpenChange}
+      {hasItemActions && !loading && !nestedRowProps?.onLoadMoreChildren && (
+        <>
+          {/** Desktop item actions adds a sticky column to the table to not overflow when the table is scrolled horizontally*/}
+          <td className="sticky right-0 top-0 z-10 hidden md:table-cell">
+            <ItemActionsRowContainer dropDownOpen={dropDownOpen}>
+              <ItemActionsRow
+                primaryItemActions={primaryItemActions}
+                dropdownItemActions={dropdownItemActions}
+                handleDropDownOpenChange={handleDropDownOpenChange}
               />
-            </TableCell>
-          </>
-        )}
+            </ItemActionsRowContainer>
+          </td>
+          {/** Mobile item actions */}
+          <TableCell
+            key={`table-cell-${groupIndex}-${index}-actions`}
+            width={68}
+            sticky={{
+              right: 0,
+            }}
+            href={itemHref}
+            className="table-cell md:hidden"
+            loading={loading}
+          >
+            <ItemActionsMobile
+              items={mobileDropdownItemActions}
+              onOpenChange={handleDropDownOpenChange}
+            />
+          </TableCell>
+        </>
+      )}
     </TableRow>
   )
 }

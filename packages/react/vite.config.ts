@@ -115,6 +115,7 @@ export default defineConfig({
       entry: {
         ["f0"]: resolve(__dirname, "src/f0.ts"),
         ["experimental"]: resolve(__dirname, "src/experimental.ts"),
+        ["ai"]: resolve(__dirname, "src/ai.ts"),
         ["i18n-provider-defaults"]: resolve(
           __dirname,
           "src/lib/providers/i18n/i18n-provider-defaults.ts"
@@ -128,7 +129,14 @@ export default defineConfig({
     outDir: "dist",
     copyPublicDir: false,
     rollupOptions: {
-      external: ["react/jsx-runtime", "react", "react-dom", /@copilotkit\/.*/],
+      external: [
+        "react/jsx-runtime",
+        "react",
+        "react-dom",
+        /@copilotkit\/.*/,
+        /@livekit\/.*/,
+        "livekit-client",
+      ],
       maxParallelFileOps: 100,
       // Workaround to fix rebuild https://github.com/vitejs/vite/issues/19410#issuecomment-2661835482
       output: {

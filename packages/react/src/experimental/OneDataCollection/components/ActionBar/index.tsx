@@ -1,3 +1,7 @@
+import NumberFlow from "@number-flow/react"
+import { AnimatePresence, motion } from "motion/react"
+import { Fragment, useCallback, useMemo } from "react"
+
 import { F0AvatarAlert } from "@/components/avatars/F0AvatarAlert"
 import { F0Button } from "@/components/F0Button"
 import {
@@ -8,9 +12,6 @@ import { IconType } from "@/components/F0Icon"
 import { Dropdown, MobileDropdown } from "@/experimental/Navigation/Dropdown"
 import { useI18n } from "@/lib/providers/i18n"
 import { cn } from "@/lib/utils"
-import NumberFlow from "@number-flow/react"
-import { AnimatePresence, motion } from "motion/react"
-import { Fragment, useCallback, useMemo } from "react"
 
 type ActionType = {
   label: string
@@ -89,6 +90,33 @@ interface ActionBarProps {
    * The warning message to show in the action bar
    */
   warningMessage?: string
+
+  /**
+   * Whether all-pages selection mode is active.
+   * When true, shows a banner to select all items across pages.
+   */
+  allPagesSelection?: boolean
+
+  /**
+   * Whether all items on the current page are selected.
+   * Used together with allPagesSelection to show the "select all items" banner.
+   */
+  isAllCurrentPageSelected?: boolean
+
+  /**
+   * Whether the user has opted to select ALL items across all pages.
+   */
+  isAllItemsSelected?: boolean
+
+  /**
+   * Total number of items across all pages.
+   */
+  totalItems?: number
+
+  /**
+   * Callback to select all items across all pages.
+   */
+  onSelectAllItems?: () => void
 }
 
 const Alert = ({ message }: { message: string }) => {
@@ -106,14 +134,34 @@ export const ActionBar = ({
   selectedNumber = undefined,
   onUnselect,
   warningMessage,
+  allPagesSelection = false,
+  isAllCurrentPageSelected = false,
+  isAllItemsSelected = false,
+  totalItems,
+  onSelectAllItems,
   ...props
 }: ActionBarProps) => {
-  const i18n = useI18n()
+  const { t, ...i18n } = useI18n()
 
   const selectedText =
     selectedNumber === 1
       ? i18n.status.selected.singular
       : i18n.status.selected.plural
+
+  // Show the "select all across pages" banner when:
+  // - all-pages selection mode is active
+  // - all items on the current page are selected
+  // - but NOT all items across all pages are selected yet
+  const showSelectAllBanner =
+    allPagesSelection &&
+    isAllCurrentPageSelected &&
+    !isAllItemsSelected &&
+    totalItems !== undefined &&
+    totalItems > 0
+
+  // Show "all items selected" confirmation when all items across pages are selected
+  const showAllItemsSelected =
+    allPagesSelection && isAllItemsSelected && totalItems !== undefined
 
   const visibleSecondaryActions = secondaryActions.slice(0, 2)
   const dropdownActions = secondaryActions.slice(2).map((action) => ({
@@ -178,22 +226,40 @@ export const ActionBar = ({
           )}
         >
           {selectedNumber && (
-            <div className="dark flex h-8 w-full items-center justify-between gap-2 px-2 sm:h-auto sm:w-fit sm:justify-start sm:pl-2 sm:pr-0">
-              <span className="font-medium tabular-nums">
-                <NumberFlow
-                  value={selectedNumber}
-                  spinTiming={{
-                    duration: 200,
-                    easing: "cubic-bezier(0.175, 0.885, 0.32, 1.275)",
-                  }}
+            <div className="dark flex h-8 w-full items-center justify-between gap-3 px-2 sm:h-auto sm:w-fit sm:justify-start sm:pl-2 sm:pr-0">
+              {showAllItemsSelected ? (
+                <span className="font-medium tabular-nums">
+                  {t("status.selected.allItemsSelected", {
+                    total: totalItems ?? 0,
+                  })}
+                </span>
+              ) : (
+                <span className="font-medium tabular-nums">
+                  <NumberFlow
+                    value={selectedNumber}
+                    spinTiming={{
+                      duration: 200,
+                      easing: "cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                    }}
+                  />
+                  <span> {selectedText}</span>
+                </span>
+              )}
+              {showSelectAllBanner && (
+                <F0Button
+                  variant="outline"
+                  size="sm"
+                  label={t("status.selected.selectAllItems", {
+                    total: totalItems ?? 0,
+                  })}
+                  onClick={onSelectAllItems}
                 />
-                <span> {selectedText}</span>
-              </span>
+              )}
               <F0Button
                 variant="outline"
-                size="sm"
                 label={i18n.actions.unselect}
                 onClick={onUnselect}
+                size="sm"
               />
             </div>
           )}
@@ -216,7 +282,6 @@ export const ActionBar = ({
                         const action = getActionByValue(value)
                         ;(action as ActionType)?.onClick?.()
                       }}
-                      size="lg"
                     />
                   ) : (
                     <F0Button
@@ -224,7 +289,6 @@ export const ActionBar = ({
                       icon={singlePrimaryAction.icon}
                       onClick={singlePrimaryAction.onClick}
                       disabled={singlePrimaryAction.disabled}
-                      size="lg"
                     />
                   )}
                 </Fragment>

@@ -1,4 +1,7 @@
 import { ComponentProps } from "react"
+
+import { experimentalComponent } from "@/lib/experimental"
+
 import { BaseHeader } from "../BaseHeader"
 
 type BaseHeaderProps = ComponentProps<typeof BaseHeader>
@@ -13,9 +16,10 @@ type Props = {} & Pick<
   | "otherActions"
   | "metadata"
   | "status"
+  | "deactivated"
 >
 
-export const ResourceHeader = ({
+const _ResourceHeader = ({
   avatar,
   title,
   description,
@@ -24,6 +28,7 @@ export const ResourceHeader = ({
   otherActions,
   status,
   metadata,
+  deactivated,
 }: Props) => {
   return (
     <BaseHeader
@@ -35,6 +40,15 @@ export const ResourceHeader = ({
       otherActions={otherActions}
       status={status}
       metadata={metadata}
+      deactivated={deactivated}
     />
   )
 }
+
+/**
+ * @experimental This is an experimental component use it at your own risk
+ */
+export const ResourceHeader = experimentalComponent(
+  "ResourceHeader",
+  _ResourceHeader
+)

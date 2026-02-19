@@ -370,7 +370,7 @@ To enable nested tables, you need to provide three methods in your data source:
     dataAdapter: myDataAdapter,
     itemsWithChildren: (item) => !!item.children?.length,
     childrenCount: ({ item }) => item.children?.length,
-    fetchChildren: async ({ item, filters, pagination }) => {
+    fetchChildren: async ({ item, filters, pagination, sortings }) => {
       const children = await fetchChildrenFromAPI(item.id)
       return {
         records: children,
@@ -528,6 +528,8 @@ fetchChildren: async ({ item }) => {
   └─ 📄 File 3
 ```
 
+<Canvas of={TableStories.TableWithNestedRecords} meta={TableStories} />
+
 #### `"detailed"`
 
 Children are displayed **aligned with the parent** without tree connectors or
@@ -557,6 +559,8 @@ fetchChildren: async ({ item }) => {
 📄 File 2.1 (child)
 📄 File 3 (child)
 ```
+
+<Canvas of={TableStories.TableWithNestedRecordsDetailed} meta={TableStories} />
 
 **Example with dynamic type:**
 
@@ -712,3 +716,5 @@ shown at the end of the expanded children. When clicked:
   ]}
 />
 ```
+
+<Canvas of={TableStories.TableWithMixedNestedRecords} meta={TableStories} />

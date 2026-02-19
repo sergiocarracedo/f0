@@ -1,4 +1,5 @@
 import { createContext } from "react"
+
 import {
   FiltersDefinition,
   FiltersMode,
@@ -18,6 +19,7 @@ export type FiltersContextType<Definition extends FiltersDefinition> = {
   emitFilterChange: (filters: FiltersState<Definition>) => void
   emitPresetClick: (filters: FiltersState<Definition>) => void
   mode?: FiltersMode
+  displayCounter?: boolean
 }
 
 export const FiltersContext = createContext<
@@ -34,4 +36,5 @@ export const FiltersContext = createContext<
   emitFilterChange: () => {},
   emitPresetClick: () => {},
   mode: "default",
+  displayCounter: false,
 })

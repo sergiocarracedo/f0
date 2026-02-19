@@ -1,9 +1,11 @@
-import { BadgeProps } from "@/experimental/Information/Badge"
+import { type ComponentProps } from "react"
+
+import { BadgeProps } from "@/ui/IconBadge"
 import {
   internalAvatarColors as AvatarColors,
   Avatar as AvatarComponent,
 } from "@/ui/Avatar"
-import { type ComponentProps } from "react"
+
 import { F0AvatarModuleProps } from "../../F0AvatarModule"
 import { AvatarSize } from "./types"
 

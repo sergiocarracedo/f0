@@ -1,6 +1,7 @@
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite"
+
+import { useState } from "react"
 import { fn } from "storybook/test"
-import { F0Select, selectSizes } from "../index"
 
 import { IconType } from "@/components/F0Icon"
 import {
@@ -10,10 +11,10 @@ import {
 } from "@/hooks/datasource"
 import { SelectedItemsDetailedStatus } from "@/hooks/datasource/types/selection.typings"
 import { Appearance, Circle, Desktop, Placeholder, Plus } from "@/icons/app"
-
 import { withSkipA11y, withSnapshot } from "@/lib/storybook-utils/parameters"
 import { inputFieldStatus } from "@/ui/InputField"
-import { useState } from "react"
+
+import { F0Select, selectSizes } from "../index"
 import {
   Employee,
   employeeNonPaginatedSource,
@@ -166,6 +167,7 @@ const meta: Meta = {
         "  label: string\n" +
         "  description?: string\n" +
         "  avatar?: AvatarVariant\n" +
+        "  tag?: string | { type: 'dot'; text: string; color: NewColor }\n" +
         "  icon?: IconType\n" +
         "  item?: unknown\n" +
         "  disabled?: boolean\n" +
@@ -353,6 +355,49 @@ export const WithDisabledOptions: Story = {
         disabled: index === 1,
       }
     }),
+  },
+}
+
+export const WithDotTags: Story = {
+  args: {
+    label: "Select a status",
+    placeholder: "Select a status",
+    onChange: fn(),
+    options: [
+      {
+        value: "active",
+        label: "Active",
+        description: "Active description",
+        tag: {
+          type: "dot",
+          text: "Active",
+          color: "viridian",
+        },
+      },
+      {
+        value: "pending",
+        label: "Pending",
+        tag: {
+          type: "dot",
+          text: "Pending",
+          color: "yellow",
+        },
+      },
+      {
+        value: "inactive",
+        label: "Inactive",
+        icon: Appearance,
+        tag: "Disabled",
+      },
+
+      {
+        value: "inactive",
+        label: "Inactive",
+        description: "Inactive description",
+        icon: Desktop,
+        tag: "Disabled",
+      },
+    ],
   },
 }
 
@@ -679,6 +724,73 @@ export const MultiplePaginated: Story = {
     onSelectItems: fn((selectionStatus) => {
       console.log("selectionStatus", selectionStatus)
     }),
+  },
+}
+
+/**
+ * Multiple selection with paginated data (2,847 employees).
+ * Use `defaultItem` to provide labels for pre-selected values not in the first page.
+ * Try the "Select All" to select all employees - the checkbox will show indeterminate state
+ * when some but not all are selected.
+ */
+export const MultiplePaginatedAsList: Story = {
+  args: {
+    label: "Select Team Members",
+    placeholder: "Search employees...",
+    multiple: true,
+    value: ["3", "42", "500", "1200"],
+    showSearchBox: true,
+    asList: true,
+    // Provide defaultItem for values not in the first page
+    defaultItem: (() => {
+      const ids = [42, 500, 1200]
+      return ids
+        .map((id) => {
+          const emp = getEmployeeById(id)
+          return emp
+            ? {
+                value: emp.value,
+                label: emp.label,
+                avatar: emp.avatar,
+              }
+            : null
+        })
+        .filter(Boolean)
+    })(),
+    clearable: true,
+    source: employeePaginatedSource,
+    mapOptions: (item: Employee) => ({
+      value: item.value,
+      label: item.label,
+      avatar: item.avatar,
+    }),
+    onSelectItems: fn((selectionStatus) => {
+      console.log("selectionStatus", selectionStatus)
+    }),
+    disableSelectAll: true,
+    hideLabel: true,
+  },
+  render: (args) => {
+    return (
+      <div className="flex h-[400px] flex-row">
+        <F0Select {...(args as any)} />
+      </div>
+    )
+  },
+}
+
+export const AsList: Story = {
+  args: {
+    label: "Select a theme",
+    value: "dark",
+    asList: true,
+  },
+  render: (args) => {
+    return (
+      <div className="flex h-max w-[300px]">
+        <F0Select {...(args as any)} />
+      </div>
+    )
   },
 }
 

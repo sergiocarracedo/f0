@@ -1,3 +1,5 @@
+import { forwardRef, useLayoutEffect, useRef } from "react"
+
 import { DataCollectionSource } from "@/experimental/OneDataCollection/hooks/useDataCollectionSource"
 import { ItemActionsDefinition } from "@/experimental/OneDataCollection/item-actions"
 import { NavigationFiltersDefinition } from "@/experimental/OneDataCollection/navigationFilters/types"
@@ -9,7 +11,7 @@ import {
   SortingsDefinition,
 } from "@/hooks/datasource"
 import { ChildrenPaginationInfo } from "@/hooks/datasource/types/nested.typings"
-import { forwardRef, useLayoutEffect, useRef } from "react"
+
 import { Row, RowProps } from "../Row"
 
 export const DEFAULT_LOADING_ROWS_COUNT = 5
@@ -36,6 +38,7 @@ const SingleLoadingRowInner = <
     selectedItems,
     checkColumnWidth,
     tableWithChildren,
+    shouldHideBorder,
   }: RowProps<
     R,
     Filters,
@@ -47,6 +50,7 @@ const SingleLoadingRowInner = <
   > & {
     rowRef: React.RefObject<HTMLTableRowElement>
     rowIndex: number
+    shouldHideBorder?: boolean
   },
   ref:
     | ((element: HTMLTableRowElement | null) => void)
@@ -84,7 +88,7 @@ const SingleLoadingRowInner = <
       index={rowIndex}
       frozenColumnsLeft={frozenColumnsLeft}
       columns={columns}
-      noBorder
+      noBorder={shouldHideBorder ?? false}
       groupIndex={groupIndex}
       onCheckedChange={onCheckedChange}
       selectedItems={selectedItems}
@@ -122,6 +126,7 @@ const SingleLoadingRow = forwardRef(SingleLoadingRowInner) as <
   > & {
     rowRef: React.RefObject<HTMLTableRowElement>
     rowIndex: number
+    shouldHideBorder?: boolean
   } & {
     ref?:
       | ((element: HTMLTableRowElement | null) => void)
@@ -162,6 +167,7 @@ const RowLoadingInner = <
       Grouping
     >
     paginationInfo?: ChildrenPaginationInfo
+    shouldHideBorder?: boolean
   },
   ref:
     | ((element: HTMLTableRowElement | null) => void)
@@ -188,15 +194,22 @@ const RowLoadingInner = <
 
   return (
     <>
-      {Array.from({ length: loadingRowsCount }).map((_, rowIndex) => (
-        <SingleLoadingRow
-          key={`row-loading-${rowIndex}`}
-          ref={ref}
-          rowRef={rowRef}
-          rowIndex={rowIndex}
-          {...props}
-        />
-      ))}
+      {Array.from({ length: loadingRowsCount }).map((_, rowIndex) => {
+        const isLastLoadingRow = rowIndex === loadingRowsCount - 1
+        // Only show border on the last loading row if parent is isLastChild
+        const rowShouldHideBorder = !isLastLoadingRow || props.shouldHideBorder
+
+        return (
+          <SingleLoadingRow
+            key={`row-loading-${rowIndex}`}
+            ref={ref}
+            rowRef={rowRef}
+            rowIndex={rowIndex}
+            {...props}
+            shouldHideBorder={rowShouldHideBorder}
+          />
+        )
+      })}
     </>
   )
 }
@@ -235,5 +248,6 @@ export const RowLoading = forwardRef(RowLoadingInner) as <
       | ((element: HTMLTableRowElement | null) => void)
       | React.RefObject<HTMLTableRowElement>
       | null
+    shouldHideBorder?: boolean
   }
 ) => JSX.Element

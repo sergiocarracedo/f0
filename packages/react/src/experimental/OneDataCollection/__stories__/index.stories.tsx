@@ -1,3 +1,6 @@
+import { Meta, StoryObj } from "@storybook/react-vite"
+import { useEffect, useState } from "react"
+
 import { SummariesDefinition } from "@/experimental/OneDataCollection/summary.ts"
 import { GroupingDefinition } from "@/hooks/datasource"
 import {
@@ -36,14 +39,14 @@ import {
   YEARS_OF_EXPERIENCIE_MOCK,
 } from "@/mocks"
 import { mockImage } from "@/testing/mocks/images"
-import { Meta, StoryObj } from "@storybook/react-vite"
-import { useEffect, useState } from "react"
+
+import type { CustomVisualizationProps } from "../visualizations/collection"
+
 import { useDataCollectionData } from "../hooks/useDataCollectionData/useDataCollectionData"
 import { useDataCollectionSource } from "../hooks/useDataCollectionSource"
 import { OneDataCollection } from "../index"
 import { ItemActionsDefinition } from "../item-actions"
 import { NavigationFiltersDefinition } from "../navigationFilters/types"
-import type { CustomVisualizationProps } from "../visualizations/collection"
 import {
   createDataAdapter,
   createPromiseDataFetch,
@@ -874,6 +877,64 @@ export const WithSelectableAndBulkActions: Story = {
       }}
     />
   ),
+}
+
+export const WithPageOnlySelection: Story = {
+  render: () => {
+    const paginatedMockUsers = generateMockUsers(50)
+
+    return (
+      <ExampleComponent
+        selectable={(item) => item.id}
+        // Page-only selection is the default behavior - selection resets on page change
+        dataAdapter={createDataAdapter({
+          data: paginatedMockUsers,
+          delay: 500,
+          paginationType: "pages",
+        })}
+        bulkActions={({ selectedCount }) => ({
+          primary: [
+            {
+              label: `Delete ${selectedCount} item${selectedCount > 1 ? "s" : ""} from current page`,
+              icon: Delete,
+              id: "delete-page",
+              critical: true,
+            },
+          ],
+        })}
+      />
+    )
+  },
+}
+
+export const WithCrossPageSelection: Story = {
+  render: () => {
+    const paginatedMockUsers = generateMockUsers(50)
+
+    return (
+      <ExampleComponent
+        selectable={(item) => item.id}
+        allPagesSelection={true} // Maintain selection across pages
+        dataAdapter={createDataAdapter({
+          data: paginatedMockUsers,
+          delay: 500,
+          paginationType: "pages",
+        })}
+        bulkActions={({ allSelected, selectedCount }) => ({
+          primary: [
+            {
+              label: allSelected
+                ? "Delete all items"
+                : `Delete ${selectedCount} selected item${selectedCount > 1 ? "s" : ""}`,
+              icon: Delete,
+              id: "delete-all",
+              critical: true,
+            },
+          ],
+        })}
+      />
+    )
+  },
 }
 
 export const WithSelectableAndDefaultSelectedItems: Story = {

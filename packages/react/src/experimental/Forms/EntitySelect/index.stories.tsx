@@ -1,10 +1,12 @@
 import type { Meta } from "@storybook/react-vite"
 
-import { F0TagRaw } from "@/components/tags/F0TagRaw"
-import { Placeholder, Plus } from "@/icons/app"
 import { ChevronDown, ChevronRight } from "lucide-react"
 import { ComponentProps, useState } from "react"
 import { expect, fn, userEvent, within } from "storybook/test"
+
+import { F0TagRaw } from "@/components/tags/F0TagRaw"
+import { Placeholder, Plus } from "@/icons/app"
+
 import { famousEmployees } from "./entity-select-name.factory"
 import {
   teamsWithEmployees,
@@ -732,6 +734,41 @@ export const WithLabelIcon = {
     label: "Select an employee",
     labelIcon: Placeholder,
     hideLabel: false,
+  },
+}
+
+export const WithDeactivatedEntities = {
+  args: {
+    ...defaultArgs,
+    label: "Select an employee",
+    labelIcon: Placeholder,
+    hideLabel: false,
+  },
+  render: (props: ComponentProps<typeof EntitySelect>) => {
+    const [loading, setLoading] = useState<boolean>(props.loading ?? true)
+    const [selectedGroup, setSelectedGroup] = useState<string>(
+      props.selectedGroup ?? "all"
+    )
+
+    const entities = GROUP_DATA[selectedGroup as keyof typeof GROUP_DATA] || []
+    entities[0].deactivated = true
+    const [selected] = useState<EntitySelectEntity[]>([{ ...entities[0] }])
+
+    return (
+      <div className="w-64">
+        <EntitySelect
+          {...props}
+          loading={loading}
+          entities={entities}
+          selectedEntities={selected}
+          selectedGroup={selectedGroup}
+          onGroupChange={(value) => setSelectedGroup(value ?? "all")}
+          onOpenChange={(open) =>
+            open ? setTimeout(() => setLoading(false), 500) : setLoading(true)
+          }
+        />
+      </div>
+    )
   },
 }
 

@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
+
 import { useState } from "react"
+
 import * as Icons from "../../icons/app"
 import { Chip } from "./index"
 
@@ -107,6 +109,26 @@ export const WithAvatar: Story = {
           src: "/avatars/factorial.png",
         }}
       />
+    </div>
+  ),
+}
+
+export const WithDeactivatedAvatarAndLabel: Story = {
+  args: {
+    label: "Deactivated User",
+    variant: "default",
+    deactivated: true,
+    avatar: {
+      type: "person",
+      deactivated: true,
+      firstName: "Deactivated",
+      lastName: "User",
+      src: "/avatars/person01.jpg",
+    },
+  },
+  render: ({ icon: _icon, ...args }) => (
+    <div className="flex flex-wrap gap-2">
+      <Chip {...args} />
     </div>
   ),
 }

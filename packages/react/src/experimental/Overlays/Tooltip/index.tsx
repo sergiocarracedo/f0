@@ -1,12 +1,22 @@
+import React, {
+  ComponentProps,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react"
+
+import { experimentalComponent } from "@/lib/experimental"
 import {
   TooltipContent,
   Tooltip as TooltipPrimitive,
   TooltipProvider,
   TooltipTrigger,
 } from "@/ui/tooltip"
-import React, { ComponentProps } from "react"
+
 import { cn } from "../../../lib/utils"
-import { Shortcut } from "../../Information/Shortcut"
+import { Shortcut } from "@/ui/Shortcut"
 
 type TooltipInternalProps = {
   children: React.ReactNode
@@ -32,14 +42,71 @@ export function TooltipInternal({
   instant = false,
   delay = 700,
 }: TooltipInternalProps) {
+  const [open, setOpen] = useState(false)
+  const openTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const openDelayMs = useMemo(() => (instant ? 100 : delay), [delay, instant])
+
+  const clearOpenTimeout = useCallback(() => {
+    if (openTimeoutRef.current) {
+      clearTimeout(openTimeoutRef.current)
+      openTimeoutRef.current = null
+    }
+  }, [])
+
+  const close = useCallback(() => {
+    clearOpenTimeout()
+    setOpen(false)
+  }, [clearOpenTimeout])
+
+  const scheduleOpen = useCallback(() => {
+    clearOpenTimeout()
+    openTimeoutRef.current = setTimeout(() => setOpen(true), openDelayMs)
+  }, [clearOpenTimeout, openDelayMs])
+
+  useEffect(() => close, [close])
+
+  const isFocusVisible = useCallback((el: Element) => {
+    try {
+      return el.matches(":focus-visible")
+    } catch {
+      return false
+    }
+  }, [])
+
   return (
     <>
       <TooltipProvider
-        delayDuration={instant ? 100 : delay}
+        delayDuration={openDelayMs}
         disableHoverableContent={instant}
       >
-        <TooltipPrimitive>
-          <TooltipTrigger asChild className="pointer-events-auto">
+        <TooltipPrimitive
+          open={open}
+          onOpenChange={(nextOpen) => {
+            // We control when the tooltip opens so it doesn't show on mouse click
+            // focus/programmatic focus. Still allow Radix to request closing (e.g. escape).
+            if (!nextOpen) close()
+          }}
+        >
+          <TooltipTrigger
+            asChild
+            className="pointer-events-auto"
+            onPointerEnter={(e) => {
+              if (e.pointerType === "touch") return
+              scheduleOpen()
+            }}
+            onPointerLeave={() => close()}
+            onPointerDown={() => close()}
+            onFocus={(e) => {
+              if (isFocusVisible(e.currentTarget)) {
+                setOpen(true)
+              } else {
+                // If focus comes from mouse/touch/programmatic focus, keep closed.
+                close()
+              }
+            }}
+            onBlur={() => close()}
+          >
             {children}
           </TooltipTrigger>
           <TooltipContent
@@ -72,7 +139,7 @@ export type TooltipProps = Omit<
   (typeof privateProps)[number]
 >
 
-const Tooltip = (props: TooltipProps) => {
+const _Tooltip = (props: TooltipProps) => {
   const publicProps = privateProps.reduce((acc, key) => {
     const { [key]: _, ...rest } = acc
     return rest
@@ -81,4 +148,7 @@ const Tooltip = (props: TooltipProps) => {
   return <TooltipInternal {...publicProps} />
 }
 
-export { Tooltip }
+/**
+ * @experimental This is an experimental component use it at your own risk
+ */
+export const Tooltip = experimentalComponent("Tooltip", _Tooltip)

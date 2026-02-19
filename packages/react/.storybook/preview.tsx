@@ -1,20 +1,21 @@
-// organize-imports-ignore
-import React, { useState } from "react"
-import { INITIAL_VIEWPORTS } from "storybook/viewport"
 import type { Preview, StoryFn, StoryContext } from "@storybook/react-vite"
 
-import { action } from "storybook/actions"
-import { MotionGlobalConfig } from "motion/react"
-
 import isChromatic from "chromatic/isChromatic"
+import { MotionGlobalConfig } from "motion/react"
+// organize-imports-ignore
+import React, { useState } from "react"
+import { action } from "storybook/actions"
+import { INITIAL_VIEWPORTS } from "storybook/viewport"
 
 import "../src/styles.css"
-
-import { ThemeProvider } from "@/lib/providers/theme"
-import { F0Provider } from "@/lib/providers/f0"
-import { DocsContainer } from "./DocsContainer.tsx"
-import { buildTranslations, defaultTranslations } from "@/lib/providers/i18n"
+import { aiTranslations } from "@/sds/ai/F0AiChat/types"
+import { WeekStartDay } from "@/experimental/OneCalendar/types"
 import { dataCollectionLocalStorageHandler } from "@/lib/providers/datacollection"
+import { F0Provider } from "@/lib/providers/f0"
+import { buildTranslations, defaultTranslations } from "@/lib/providers/i18n"
+import { ThemeProvider } from "@/lib/providers/theme"
+
+import { DocsContainer } from "./DocsContainer.tsx"
 
 MotionGlobalConfig.skipAnimations = isChromatic()
 
@@ -38,11 +39,18 @@ export const F0 = (Story: StoryFn, { parameters }: StoryContext) => {
         fullScreen: parameters.layout === "fullscreen",
       }}
       i18n={{
-        translations: buildTranslations(defaultTranslations),
+        translations: buildTranslations({
+          ...defaultTranslations,
+          ...aiTranslations,
+        }),
       }}
       l10n={{
         l10n: {
           locale: parameters.l10n?.locale ?? "en",
+          date: {
+            weekStartsOn:
+              parameters.l10n?.date?.weekStartsOn ?? WeekStartDay.Monday,
+          },
         },
       }}
       link={{
@@ -52,7 +60,6 @@ export const F0 = (Story: StoryFn, { parameters }: StoryContext) => {
             ref={ref}
             {...props}
             onClick={(event, ...args) => {
-              console.log("Link clicked", event, ...args)
               action("Link clicked")(event, ...args)
               props?.onClick?.(event, ...args)
               event.preventDefault()
@@ -64,9 +71,18 @@ export const F0 = (Story: StoryFn, { parameters }: StoryContext) => {
         ),
       }}
       image={{
-        src: ({ src, width, height }) => ({
-          src: src?.startsWith("data:") ? src : `${src}?w=${width}&h=${height}`,
-        }),
+        src: ({ src, width, height }) => {
+          if (!src || src.startsWith("data:")) return { src }
+          const hasQuery = src.includes("?")
+          const separator = hasQuery ? "&" : "?"
+          const params = []
+          if (width !== undefined) params.push(`w=${width}`)
+          if (height !== undefined) params.push(`h=${height}`)
+          return {
+            src:
+              params.length > 0 ? `${src}${separator}${params.join("&")}` : src,
+          }
+        },
       }}
       isDev={parameters.isDev ?? false}
       dataCollectionStorageHandler={dataCollectionLocalStorageHandler}

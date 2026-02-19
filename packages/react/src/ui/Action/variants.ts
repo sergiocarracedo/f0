@@ -1,5 +1,6 @@
-import { cn } from "@/lib/utils"
 import { cva } from "cva"
+
+import { cn } from "@/lib/utils"
 
 const baseButton =
   "group relative inline-flex items-center justify-center gap-1 whitespace-nowrap rounded border-none p-0 text-base font-medium shadow-[0_2px_6px_-1px_rgba(13,22,37,.04),inset_0_-2px_4px_rgba(13,22,37,.04)] transition-colors [&_.main]:transform-gpu [&_.main]:transition-transform [&_.main]:duration-100 active:[&_.main]:translate-y-px [&_.main]:flex [&_.main]:items-center [&_.main]:justify-center disabled:opacity-30 disabled:cursor-not-allowed no-underline [&_.main]:z-20"
@@ -94,7 +95,7 @@ export const actionVariants = cva({
 export const buttonSizeVariants = cva({
   variants: {
     size: {
-      sm: "rounded-sm text-sm before:rounded-[7px] [&_.main]:h-6 [&_.main]:px-2",
+      sm: "rounded-sm text-base before:rounded-[7px] [&_.main]:h-6 [&_.main]:px-2",
       md: "rounded text-base before:rounded-[9px] [&_.main]:h-8 [&_.main]:px-3",
       lg: "rounded-md text-lg before:rounded-[11px] [&_.main]:h-10 [&_.main]:px-4",
     },

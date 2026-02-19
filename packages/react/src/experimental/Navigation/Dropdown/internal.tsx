@@ -1,3 +1,5 @@
+import React, { useState } from "react"
+
 import { AvatarVariant } from "@/components/avatars/F0Avatar"
 import { F0ButtonProps } from "@/components/F0Button"
 import { ButtonInternal } from "@/components/F0Button/internal"
@@ -11,15 +13,20 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/ui/dropdown-menu"
-import React, { useState } from "react"
+
 import { NavigationItem } from "../utils"
 import { DropdownItemContent } from "./DropdownItem"
 
 export type DropdownItemSeparator = { type: "separator" }
-export type DropdownItem = DropdownItemObject | DropdownItemSeparator
+export type DropdownItemLabel = { type: "label"; text: string }
+export type DropdownItem =
+  | DropdownItemObject
+  | DropdownItemSeparator
+  | DropdownItemLabel
 
 export type DropdownItemObject = Pick<NavigationItem, "label" | "href"> & {
   type?: "item"
@@ -38,6 +45,7 @@ export type DropdownInternalProps = {
   align?: "start" | "end" | "center"
   open?: boolean
   onOpenChange?: (open: boolean) => void
+  label?: string
 } & DataAttributes
 
 const DropdownItem = ({ item }: { item: DropdownItemObject }) => {
@@ -78,6 +86,41 @@ const DropdownItem = ({ item }: { item: DropdownItemObject }) => {
   )
 }
 
+function renderDropdownItem(
+  item: DropdownItem,
+  index: number
+): React.ReactNode {
+  if (item.type === "separator") {
+    return <DropdownMenuSeparator key={index} />
+  }
+
+  if (item.type === "label") {
+    return (
+      <DropdownMenuLabel
+        key={index}
+        className="flex-1 text-xs font-medium leading-4 text-f1-foreground-secondary"
+      >
+        {item.text}
+      </DropdownMenuLabel>
+    )
+  }
+
+  return (
+    <DropdownItem
+      key={index}
+      item={{
+        ...item,
+        onClick: () => {
+          // Seems to be a bug on radix-ui that mix the animation events, and if the dropdown triggers a dialog, the dialog will be closed before the dropdown is closed
+          setTimeout(() => {
+            item.onClick?.()
+          }, 200)
+        },
+      }}
+    />
+  )
+}
+
 export function DropdownInternal({
   items,
   icon = EllipsisHorizontal,
@@ -86,6 +129,7 @@ export function DropdownInternal({
   children,
   open: controlledOpen,
   onOpenChange: controlledOnOpenChange,
+  label,
   ...rest
 }: DropdownInternalProps) {
   const i18n = useI18n()
@@ -102,37 +146,20 @@ export function DropdownInternal({
         {children || (
           <ButtonInternal
             {...rest}
-            hideLabel
+            hideLabel={!label}
             icon={icon}
             size={size}
-            label={i18n.actions.toggleDropdownMenu}
+            label={label ?? i18n.actions.toggleDropdownMenu}
             variant="outline"
             pressed={open}
-            compact
+            compact={!label}
             noAutoTooltip
             noTitle
           />
         )}
       </DropdownMenuTrigger>
       <DropdownMenuContent align={align}>
-        {items.map((item, index) =>
-          item.type === "separator" ? (
-            <DropdownMenuSeparator key={index} />
-          ) : (
-            <DropdownItem
-              key={index}
-              item={{
-                ...item,
-                onClick: () => {
-                  // Seems to be a bug on radi-ui that mix the animation events, and if the dropdown triggers a dialog, the dialog will be closed before the dropdown is closed
-                  setTimeout(() => {
-                    item.onClick?.()
-                  }, 200)
-                },
-              }}
-            />
-          )
-        )}
+        {items.map((item, index) => renderDropdownItem(item, index))}
       </DropdownMenuContent>
     </DropdownMenu>
   )

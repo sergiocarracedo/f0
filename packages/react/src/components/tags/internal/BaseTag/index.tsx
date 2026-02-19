@@ -1,9 +1,10 @@
+import { forwardRef, ReactNode } from "react"
+
 import { F0Icon } from "@/components/F0Icon"
 import { OneEllipsis } from "@/components/OneEllipsis"
 import { Tooltip } from "@/experimental/Overlays/Tooltip"
 import { InfoCircleLine } from "@/icons/app"
 import { cn } from "@/lib/utils"
-import { forwardRef, ReactNode } from "react"
 
 type BaseTagProps = {
   /**
@@ -22,6 +23,7 @@ type BaseTagProps = {
    * Whether to hide the label
    */
   hideLabel?: boolean
+  deactivated?: boolean
 } & (
   | {
       left: ReactNode
@@ -47,6 +49,7 @@ export const BaseTag = forwardRef<HTMLDivElement, BaseTagProps>(
       info,
       shape = "rounded",
       hideLabel,
+      deactivated,
     },
     ref
   ) => {
@@ -67,7 +70,13 @@ export const BaseTag = forwardRef<HTMLDivElement, BaseTagProps>(
         >
           {left}
           {!!text && !hideLabel && (
-            <OneEllipsis tag="span" lines={1}>
+            <OneEllipsis
+              tag="span"
+              lines={1}
+              className={
+                deactivated ? "text-f1-foreground-disabled" : undefined
+              }
+            >
               {text}
             </OneEllipsis>
           )}

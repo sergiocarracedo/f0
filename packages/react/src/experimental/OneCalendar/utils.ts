@@ -1,10 +1,25 @@
 import { format, isAfter, isBefore, isEqual } from "date-fns"
 import * as locales from "date-fns/locale"
 import { Matcher } from "react-day-picker"
-import { rangeSeparator } from "./granularities/consts"
 
 import { GranularityDefinition } from "./granularities"
+import { rangeSeparator } from "./granularities/consts"
 import { DateRange, DateRangeComplete, DateRangeString } from "./types"
+
+/**
+ * Converts a date-fns format string to a human-readable placeholder pattern.
+ * e.g. "dd/MM/yyyy" → "dd/mm/yyyy", "'W'I yyyy" → "Wnn yyyy"
+ */
+export const formatToPlaceholder = (formatStr: string): string => {
+  return formatStr
+    .replace(/'([^']+)'/g, "$1") // Remove quotes around literals (e.g., 'W' → W, 'Q' → Q)
+    .replace(/MM/g, "mm") // Month number → mm
+    .replace(/dd/g, "dd") // Day → dd
+    .replace(/yyyy/g, "yyyy") // Year → yyyy
+    .replace(/I/g, "nn") // ISO week number → nn
+    .replace(/Q/g, "n") // Quarter number → n
+}
+
 // Get the locale object from date-fns/locale
 
 export const getLocale = (localeKey: string) => {

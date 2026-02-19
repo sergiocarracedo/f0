@@ -1,6 +1,8 @@
+import { Fragment } from "react"
+
+import { AvatarVariant, F0Avatar } from "@/components/avatars/F0Avatar"
 import { F0Button } from "@/components/F0Button"
 import { F0ButtonDropdown } from "@/components/F0ButtonDropdown"
-import { AvatarVariant, F0Avatar } from "@/components/avatars/F0Avatar"
 import { StatusVariant } from "@/components/tags/F0TagStatus"
 import { Description } from "@/experimental/Information/Headers/BaseHeader/Description"
 import {
@@ -20,13 +22,13 @@ import {
   MobileDropdown,
 } from "@/experimental/Navigation/Dropdown"
 import { cn } from "@/lib/utils"
-import { Fragment } from "react"
 
 export type HeaderSecondaryAction = SecondaryAction & {
   hideLabel?: boolean
 }
 interface BaseHeaderProps {
   title: string
+  deactivated?: boolean
   avatar?:
     | {
         type: "generic"
@@ -54,6 +56,7 @@ const isVisible = (action: { isVisible?: boolean }) =>
 export function BaseHeader({
   title,
   avatar,
+  deactivated,
   description,
   primaryAction,
   secondaryActions = [],
@@ -120,7 +123,12 @@ export function BaseHeader({
             </div>
           )}
           <div className="flex flex-col gap-1">
-            <span className="text-2xl font-semibold text-f1-foreground">
+            <span
+              className={cn(
+                "text-2xl font-semibold",
+                deactivated ? "text-f1-foreground/[0.61]" : "text-f1-foreground"
+              )}
+            >
               {title}
             </span>
             {description && <Description description={description} />}

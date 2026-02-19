@@ -1,14 +1,16 @@
 "use client"
 
+import { useEffect, useMemo, useRef, useState } from "react"
+
 import { F0Button } from "@/components/F0Button"
 import { F0Checkbox } from "@/components/F0Checkbox"
 import { OneEllipsis } from "@/components/OneEllipsis"
 import { F1SearchBox } from "@/experimental/Forms/Fields/F1SearchBox"
-import { Spinner } from "@/experimental/Information/Spinner"
+import { Spinner } from "@/ui/Spinner"
 import { RecordType } from "@/hooks/datasource"
 import { useI18n } from "@/lib/providers/i18n"
 import { cn, focusRing } from "@/lib/utils"
-import { useEffect, useMemo, useRef, useState } from "react"
+
 import { FilterTypeComponentProps } from "../types"
 import { InFilterOptions } from "./types"
 import { cacheLabel, getCacheKey, useLoadOptions } from "./useLoadOptions"
@@ -149,7 +151,7 @@ export function InFilter<T extends string, R extends RecordType = RecordType>({
     )
   }
 
-  if (options.length === 0) {
+  if (options.length === 0 && !hasSource) {
     return (
       <div className="flex w-full items-center justify-center py-4 text-sm text-f1-foreground-secondary">
         No options available
@@ -157,9 +159,7 @@ export function InFilter<T extends string, R extends RecordType = RecordType>({
     )
   }
 
-  // Determine if we should show the search input
-  // Show search when we have loaded options (regardless of whether they came from static or async source)
-  const showSearch = options.length > 0
+  const showSearch = options.length > 0 || hasSource
 
   const handleSelectAll = () => {
     const currentValues = value ?? []
@@ -206,7 +206,7 @@ export function InFilter<T extends string, R extends RecordType = RecordType>({
 
   return (
     <div
-      className="flex min-h-full w-full flex-col"
+      className="flex max-h-full w-full flex-col flex-1 min-h-0"
       role="group"
       aria-label={schema.label}
     >
@@ -246,6 +246,11 @@ export function InFilter<T extends string, R extends RecordType = RecordType>({
               presentational
               hideLabel
             />
+          </div>
+        )}
+        {filteredOptions.length === 0 && !isLoading && (
+          <div className="flex w-full items-center justify-center py-4 text-sm text-f1-foreground-secondary">
+            {i18n.select.noResults}
           </div>
         )}
         {filteredOptions.map((option) => {

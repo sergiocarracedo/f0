@@ -1,13 +1,16 @@
+import { forwardRef, useEffect, useState } from "react"
+
 import type {
   GranularityDefinition,
   GranularityDefinitionKey,
 } from "@/experimental/OneCalendar"
+
 import { isActiveDate } from "@/experimental/OneCalendar/utils"
 import { Calendar } from "@/icons/app"
 import { useI18n } from "@/lib/providers/i18n"
 import { Input } from "@/ui/input"
 import { InputFieldProps } from "@/ui/InputField/InputField"
-import { forwardRef, useEffect, useState } from "react"
+
 import { DatePickerValue } from "../types"
 import { InputFieldInheritedProps } from "../types.internal"
 
@@ -42,7 +45,7 @@ const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
     const i18n = useI18n()
 
     useEffect(() => {
-      setInputValue(granularity.toString(value?.value, i18n))
+      setInputValue(granularity.toString(value?.value, i18n, "long"))
     }, [value, granularity, i18n])
 
     const isValidDate = (date: Date | undefined | null) => {
@@ -70,14 +73,16 @@ const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
         granularity.fromString(inputValue, i18n)
       )
 
-      if (range && isValidDate(range?.from) && isValidDate(range?.to)) {
-        onDateChange?.({
-          value: range,
-          granularity: granularity.key,
-        })
-        setError(false)
-      } else {
-        setError(true)
+      if (range) {
+        if (isValidDate(range?.from) && isValidDate(range?.to)) {
+          onDateChange?.({
+            value: range,
+            granularity: granularity.key,
+          })
+          setError(false)
+        } else {
+          setError(true)
+        }
       }
     }
 
@@ -88,10 +93,14 @@ const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
       setInputValue(value)
     }
 
+    // Use granularity placeholder as default if no placeholder provided
+    const placeholder = inputProps.placeholder ?? granularity.placeholder()
+
     return (
       <>
         <Input
           {...inputProps}
+          placeholder={placeholder}
           icon={Calendar}
           ref={ref}
           onFocus={() => onOpenChange?.(true)}

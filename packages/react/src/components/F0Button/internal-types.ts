@@ -5,6 +5,7 @@ import {
   ButtonType,
   NavTarget,
 } from "@/ui/Action"
+
 import { ButtonSize } from "./types"
 
 export type { ButtonType }
@@ -28,6 +29,10 @@ export type ButtonInternalProps = Pick<
      * The variant of the button.
      */
     variant?: ActionButtonVariant
+    /**
+     * The filters'counter value to display.
+     */
+    counterValue?: number
     /**
      * Callback fired when the button is clicked. Supports async functions for loading state.
      */

@@ -1,17 +1,20 @@
+import { AnimatePresence, motion } from "motion/react"
+import { useState } from "react"
+
 import { F0Button } from "@/components/F0Button"
 import { F0Icon } from "@/components/F0Icon"
 import { F1SearchBox } from "@/experimental/Forms/Fields/F1SearchBox"
 import { ChevronRight } from "@/icons/app"
 import { useI18n } from "@/lib/providers/i18n"
 import { cn, focusRing } from "@/lib/utils"
-import { AnimatePresence, motion } from "motion/react"
-import { useState } from "react"
-import { FilterDefinitionsByType, getFilterType } from "../filterTypes"
+
 import type {
   FilterTypeDefinition,
   FilterTypeSchema,
 } from "../filterTypes/types"
 import type { FiltersDefinition, FiltersState, FilterValue } from "../types"
+
+import { FilterDefinitionsByType, getFilterType } from "../filterTypes"
 
 /**
  * Props for the FilterList component.
@@ -60,8 +63,8 @@ export function FilterList<Definition extends FiltersDefinition>({
   return (
     <div
       className={cn(
-        "z-30 flex h-full w-full shrink-0 flex-col bg-f1-background",
-        isCompactMode ? "min-w-[224px]" : "w-[224px]",
+        "z-30 flex h-full flex-col",
+        isCompactMode ? "min-w-[224px] w-full" : "w-fit max-w-[520px]",
         !isCompactMode &&
           "border border-solid border-transparent border-r-f1-border-secondary"
       )}
@@ -79,14 +82,14 @@ export function FilterList<Definition extends FiltersDefinition>({
       </div>
       <div
         className={cn(
-          "flex h-full w-full flex-col gap-1 overflow-y-auto overflow-x-hidden p-2 pt-0",
+          "flex flex-1 h-full w-full flex-col min-h-0 max-h-full gap-1 overflow-x-hidden p-2 pt-0",
           isCompactMode && "px-1 py-0"
         )}
       >
         {isCompactMode && (
           <div className="-mx-2 mb-1 h-px border-0 border-t border-solid border-f1-border-secondary" />
         )}
-        <div className="flex flex-1 flex-col gap-1">
+        <div className="flex flex-1 flex-col gap-1 min-h-0 max-h-full overflow-y-auto">
           {Object.entries(definition).map(([key, filter]) => {
             const matchesWithSearch =
               !searchValue ||
@@ -115,7 +118,10 @@ export function FilterList<Definition extends FiltersDefinition>({
                 onClick={() => onFilterSelect(key as keyof Definition)}
               >
                 <div className="flex w-full items-center justify-start gap-2.5">
-                  <span className="line-clamp-1 w-fit flex-1 text-left">
+                  <span
+                    className="flex-1 whitespace-nowrap text-left text-f1-foreground line-clamp-1 text-ellipsis"
+                    title={filter.label}
+                  >
                     {filter.label}
                   </span>
                   <AnimatePresence>
@@ -138,7 +144,7 @@ export function FilterList<Definition extends FiltersDefinition>({
           })}
         </div>
         {isCompactMode && (
-          <div className="-mx-2 flex items-center justify-end gap-2 border border-solid border-transparent border-t-f1-border-secondary bg-f1-background p-2">
+          <div className="-mx-2 flex items-center justify-end gap-2 border border-solid border-transparent border-t-f1-border-secondary p-2">
             <F0Button
               onClick={onClickApplyFilters}
               label={i18n.filters.applyFilters}

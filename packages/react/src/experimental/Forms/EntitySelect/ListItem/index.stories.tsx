@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import { ComponentProps, useCallback, useState } from "react"
 import { fn } from "storybook/test"
+
 import { famousEmployees } from "../entity-select-name.factory"
 import { teamsWithEmployees } from "../groups-avatar-name.factory"
 import { EntitySelectListItem } from "./index"
@@ -38,6 +39,12 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
+
+export const DefaultDeactivated: Story = {
+  args: {
+    entity: { ...famousEmployees[0], deactivated: true },
+  },
+}
 
 export const GroupViewSelected: Story = {
   args: {

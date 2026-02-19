@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
+
 import { EnhancementOption, FILE_TYPES, resultType, RichTextEditor } from "."
 
 const meta = {
@@ -55,16 +56,6 @@ const meta = {
     maxCharacters: {
       control: "number",
       description: "Limits the number of characters that can be entered",
-    },
-    toolbarLabels: {
-      control: "object",
-      description:
-        "Object with labels for all toolbar elements. Required for tooltips and accessibility",
-      required: true,
-    },
-    errorConfig: {
-      control: "object",
-      description: "Configures error message display and recovery options",
     },
     height: {
       control: "select",
@@ -199,15 +190,6 @@ export const Default: Story = {
           }, 2000)
         }),
       enhancementOptions: enhancementOptions,
-      enhanceLabels: {
-        defaultError: "Error enhancing text, try again later",
-        enhanceButtonLabel: "Magic",
-        acceptChangesButtonLabel: "Accept",
-        rejectChangesButtonLabel: "Reject",
-        repeatButtonLabel: "Repeat",
-        customPromptPlaceholder: "What do you want to do?",
-        loadingEnhanceLabel: "Loading the magic...",
-      },
     },
     filesConfig: {
       onFiles: (files) => console.log(files),
@@ -246,45 +228,10 @@ export const Default: Story = {
         variant: "outline",
       },
     ],
-    toolbarLabels: {
-      bold: "Bold",
-      italic: "Italic",
-      underline: "Underline",
-      strike: "Strike",
-      highlight: "Highlight",
-      heading1: "Heading 1",
-      heading2: "Heading 2",
-      heading3: "Heading 3",
-      left: "Left",
-      center: "Center",
-      right: "Right",
-      justify: "Justify",
-      bulletList: "Bullet List",
-      orderedList: "Ordered List",
-      taskList: "Task List",
-      codeBlock: "Code Block",
-      horizontalRule: "Horizontal Rule",
-      quote: "Quote",
-      moreOptions: "More Options",
-      code: "Code",
-      divider: "Divider",
-      bullet: "Bullet",
-      ordered: "Ordered",
-      task: "Task",
-      linkPlaceholder: "Enter link http://here...",
-      linkLabel: "Link",
-      linkPaste: "Paste",
-      close: "Close",
-    },
-
     maxCharacters: 10000,
     initialEditorState: {
       content:
         "<p>There was a time when I wandered in the dark — lost in the chaos of tangled syntax, broken builds, and tabs that betrayed me. My code was clumsy, my patience thin. But then, like a lighthouse in a storm, <strong>you appeared</strong>. Sleek, fast, and strangely comforting, my text editor. You didn't just open files — you opened <em>possibilities</em>",
-    },
-    errorConfig: {
-      onClose: () => alert("Close"),
-      closeErrorButtonLabel: "Continue editing",
     },
     height: "auto",
   },

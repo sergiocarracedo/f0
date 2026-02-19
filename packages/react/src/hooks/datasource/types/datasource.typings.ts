@@ -1,8 +1,12 @@
+import { Observable } from "zen-observable-ts"
+
 import {
   FiltersDefinition,
   FiltersState,
   PresetsDefinition,
 } from "@/components/OneFilterPicker/types"
+import { PromiseState } from "@/lib/promise-to-observable"
+
 import { DataAdapter } from "./fetch.typings"
 import { GroupingDefinition, GroupingState } from "./grouping.typings"
 import { ChildrenPaginationInfo, ChildrenResponse } from "./nested.typings"
@@ -64,6 +68,16 @@ export type DataSourceDefinition<
   selectable?: (item: R) => string | number | undefined
   /** Default selected items */
   defaultSelectedItems?: SelectedItemsState<R>
+  /**
+   * When true, selection spans across all pages (cross-page selection).
+   * - Selection state persists when navigating between pages
+   * - itemStatus includes items from all pages
+   *
+   * When false (default), selection is scoped to the current page only:
+   * - Selection state resets when navigating between pages
+   * - itemStatus only includes items from the current page
+   */
+  allPagesSelection?: boolean
 
   /***** GROUPING ***************************************************/
   /** Grouping configuration */
@@ -79,11 +93,16 @@ export type DataSourceDefinition<
     item,
     filters,
     pagination,
+    sortings,
   }: {
     item: R
     filters?: FiltersState<Filters>
     pagination?: ChildrenPaginationInfo
-  }) => Promise<ChildrenResponse<R>>
+    sortings?: SortingsState<Sortings>
+  }) =>
+    | ChildrenResponse<R>
+    | Promise<ChildrenResponse<R>>
+    | Observable<PromiseState<ChildrenResponse<R>>>
   /** Function to determine if an item has children */
   itemsWithChildren?: (item: R) => boolean
   /** Function to get the number of children for an item */

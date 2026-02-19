@@ -1,3 +1,6 @@
+import { AnimatePresence, motion } from "motion/react"
+import { Fragment, useEffect, useMemo, useState } from "react"
+
 import { F0Checkbox } from "@/components/F0Checkbox"
 import { PagesPagination } from "@/experimental/OneDataCollection/components/PagesPagination"
 import { useDataCollectionSettings } from "@/experimental/OneDataCollection/Settings/SettingsProvider"
@@ -26,8 +29,7 @@ import { useI18n } from "@/lib/providers/i18n"
 import { cn } from "@/lib/utils"
 import { GroupHeader } from "@/ui/GroupHeader/index"
 import { Skeleton } from "@/ui/skeleton.tsx"
-import { AnimatePresence, motion } from "motion/react"
-import { Fragment, useEffect, useMemo, useState } from "react"
+
 import { useDataCollectionData } from "../../../hooks/useDataCollectionData"
 import { useInfiniteScrollPagination } from "../../../hooks/useInfiniteScrollPagination"
 import { ItemActionsDefinition } from "../../../item-actions"
@@ -138,6 +140,12 @@ export const TableCollection = <
   }, [paginationInfo?.total, data.records])
 
   const frozenColumnsLeft = useMemo(() => frozenColumns, [frozenColumns])
+  const getRowKey = (item: R, index: number) => {
+    if ("id" in item && item.id !== undefined && item.id !== null) {
+      return `id:${String(item.id)}`
+    }
+    return `index:${String(index)}`
+  }
 
   /**
    * Item selection
@@ -379,7 +387,7 @@ export const TableCollection = <
                             animate="visible"
                             exit="hidden"
                             custom={index}
-                            key={`row-${groupIndex}-${index}`}
+                            key={`row-${groupIndex}-${getRowKey(item, index)}`}
                             layout
                             source={source}
                             item={item}
@@ -403,7 +411,7 @@ export const TableCollection = <
             data.records.map((item, index) => {
               return (
                 <Row
-                  key={`row-${index}`}
+                  key={`row-${getRowKey(item, index)}`}
                   groupIndex={0}
                   source={source}
                   item={item}

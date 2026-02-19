@@ -2,6 +2,7 @@ import {
   FiltersDefinition,
   FiltersState,
 } from "@/components/OneFilterPicker/types"
+
 import { WithGroupId } from "../useData"
 import { RecordType } from "./records.typings"
 
@@ -45,5 +46,6 @@ export type OnSelectItemsCallback<
   selectedItems: SelectedItemsDetailedStatus<R, Filters> & {
     byLane?: Record<string, SelectedItemsDetailedStatus<R, Filters>>
   },
-  clearSelectedItems: () => void
+  clearSelectedItems: () => void,
+  handleSelectAll?: (checked: boolean) => void
 ) => void
